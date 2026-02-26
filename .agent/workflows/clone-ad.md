@@ -11,7 +11,7 @@ Reverse-engineer a successful ad and recreate it with your own product. Give the
 ## Prerequisites
 
 - A reference ad to clone (YouTube/TikTok/Instagram URL, local video file, or screenshot)
-- Product reference image(s) in `references/inputs/`
+- Product reference image(s) in `references/[brandname]/products/`
 - A `references/[brandname]_BRAND.md` file (use `/30-day-campaign` Phase 1 to create one)
 - Airtable configured with the Content table
 
@@ -34,7 +34,7 @@ Depending on what the user provides:
 2. Ask the user to describe the scenes, OR
 3. Extract key frames using ffmpeg (if available):
    ```bash
-   ffmpeg -i references/inputs/reference_ad.mp4 -vf "fps=1" references/outputs/frame_%03d.jpg
+   ffmpeg -i references/[brandname]/products/reference_ad.mp4 -vf "fps=1" references/outputs/frame_%03d.jpg
    ```
 4. Analyze extracted frames with `view_file`
 
@@ -83,7 +83,7 @@ python -c "
 import sys; sys.path.insert(0, '.')
 from dotenv import load_dotenv; load_dotenv('references/.env')
 from tools.kie_upload import upload_references
-ref_urls = upload_references(['references/inputs/product.jpg'])
+ref_urls = upload_references(['references/[brandname]/products/product.jpg'])
 f = open('references/outputs/ref_urls.txt', 'w'); f.write('\n'.join(ref_urls)); f.close()
 print('Reference URLs saved.')
 "
@@ -165,7 +165,7 @@ from tools.image_gen import generate_batch
 records = get_pending_images()
 results = generate_batch(
     records,
-    reference_paths=["references/inputs/product.jpg"],
+    reference_paths=["references/[brandname]/products/product.jpg"],
     model="nano-banana-pro",
     provider="google",
     num_variations=1,

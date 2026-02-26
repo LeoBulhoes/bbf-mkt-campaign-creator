@@ -109,7 +109,7 @@ python -c "
 import sys; sys.path.insert(0, '.')
 from dotenv import load_dotenv; load_dotenv('references/.env')
 from tools.kie_upload import upload_reference
-url = upload_reference('references/inputs/video.mp4')
+url = upload_reference('references/[brandname]/products/video.mp4')
 f = open('references/outputs/uploaded_url.txt', 'w'); f.write(url); f.close()
 print('Saved.')
 "
@@ -122,7 +122,7 @@ python -c "
 import sys; sys.path.insert(0, '.')
 from dotenv import load_dotenv; load_dotenv('references/.env')
 from tools.kie_upload import upload_references
-urls = upload_references(['references/inputs/v1.mp4', 'references/inputs/v2.mp4', 'references/inputs/v3.mp4'])
+urls = upload_references(['references/[brandname]/products/v1.mp4', 'references/[brandname]/products/v2.mp4', 'references/[brandname]/products/v3.mp4'])
 f = open('references/outputs/uploaded_urls.txt', 'w'); f.write('\n'.join(urls)); f.close()
 print('Saved.')
 "

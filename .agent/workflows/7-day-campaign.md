@@ -12,7 +12,7 @@ This workflow creates a focused 7-day content calendar designed to "kickstart" a
 
 - Airtable configured (API key, base ID, Content table created)
 - A `references/[brandname]_BRAND.md` file verified by the user
-- Product reference images in `references/inputs/`
+- Product reference images in `references/[brandname]/products/`
 - `GCP_BUCKET_NAME` and `GOOGLE_API_KEY` set in `.env`
 
 ---

@@ -81,7 +81,7 @@ Head to [my.blotato.com](https://my.blotato.com) and connect the social media ac
 
 Open the Antigravity chat and try:
 
-- **Quick post:** *"Hey, post this image to Instagram and TikTok"* (drop an image in `references/inputs/`)
+- **Quick post:** *"Hey, post this image to Instagram and TikTok"* (drop an image in `references/[brandname]/products/`)
 - **Schedule posts:** *"Schedule these 3 images across the week — one today, one tomorrow, one in two days"*
 - **Full campaign:** *"Let's create a 30-day marketing campaign for my product"* (this runs the `/30-day-campaign` workflow)
 
