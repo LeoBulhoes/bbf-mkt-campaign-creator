@@ -17,20 +17,19 @@ def get_storage_client():
     return storage.Client()
 
 
-def upload_reference(file_path, bucket_name=None):
+def upload_reference(file_path, bucket_name=None, custom_name=None):
     """
     Upload a file to GCP Cloud Storage and return the public URL.
 
     Args:
         file_path: Path to the local file
         bucket_name: Optional bucket name override (defaults to config)
+        custom_name: Optional destination blob name. 
+                     If provided and starts with 'references/' or 'ads/', it will be used as is.
+                     Otherwise it will be placed in 'references/'.
 
     Returns:
         str: The hosted download URL
-
-    Raises:
-        FileNotFoundError: If file doesn't exist
-        Exception: If upload fails
     """
     file_path = Path(file_path)
     if not file_path.exists():
@@ -48,7 +47,15 @@ def upload_reference(file_path, bucket_name=None):
 
         # Generate a unique destination blob name
         ext = file_path.suffix
-        blob_name = f"references/{uuid.uuid4().hex}{ext}"
+        if custom_name:
+            blob_name = custom_name
+            if not (blob_name.startswith('references/') or blob_name.startswith('ads/')):
+                blob_name = f"references/{blob_name}"
+            # Ensure extension matches
+            if not blob_name.endswith(ext):
+                blob_name += ext
+        else:
+            blob_name = f"references/{uuid.uuid4().hex}{ext}"
 
         blob = bucket.blob(blob_name)
         blob.upload_from_filename(str(file_path))
@@ -57,8 +64,6 @@ def upload_reference(file_path, bucket_name=None):
         try:
             blob.make_public()
         except Exception as e:
-            # Might fail if Uniform Bucket-Level Access is enforced, which is fine
-            # as long as the bucket itself is public
             pass
 
         file_url = blob.public_url
@@ -72,13 +77,6 @@ def upload_reference(file_path, bucket_name=None):
 def upload_references(file_paths, bucket_name=None):
     """
     Upload multiple reference files and return their hosted URLs.
-
-    Args:
-        file_paths: List of local file paths
-        bucket_name: Optional bucket name override
-
-    Returns:
-        list[str]: List of hosted URLs
     """
     urls = []
     for path in file_paths:

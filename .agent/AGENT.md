@@ -128,17 +128,24 @@ For each scene, generate:
 Always follow `references/docs/prompt-best-practices.md` for prompt construction.
 
 **Image prompts** — key principles:
-- Always start with aspect ratio: `9:16.` (vertical), `4:5.` (square-ish), `16:9.` (landscape)
-- Reference the product naturally in the prompt: `"wearing this t-shirt"`, `"featuring this hoodie"` — do NOT use suffix directives
+- **Structure:** `[Aspect Ratio]. [Scene naturally referencing "this product"]. [Subject Details]. [Lighting/Mood].`
+- Always start with aspect ratio: `9:16.`, `4:5.`, `1:1.`, `16:9.`
+- Relegate product details to the reference image. Use `"this [product type]"` (e.g., `"this t-shirt"`).
+- **Diversity Logic (North America):** Mix ethnicities across a campaign (60% Caucasian, 20% Hispanic/Latino, 15% Black/African American, 5% Asian).
+- **No-Go Zones:** Avoid messy environments, competing logos, complex text in images, and political/religious symbols.
+- Specify emotional energy and use high-volume scene templates (UGC/Selfie, Active Lifestyle, Studio Hero, Urban/Street).
 - Describe real people, real settings, natural lighting — UGC outperforms studio
 - Specify emotional energy: "excited", "calm confidence", "casual surprise"
 - Mix image types across campaigns: UGC selfie, studio hero, close-up detail, urban lifestyle, CGI world-building, flat lay
 
 **Video prompts** — key principles:
-- Reference the source image: "Starting from the image, the person slowly..."
-- Describe camera movement: "slow push-in", "dolly zoom", "handheld tracking"
-- Keep motion subtle — Veo works best with intentional, controlled movement
+- **Structure:** `Starting from the [ad], the subject wearing **this [product]** [Motion Description]. [Camera Movement]. [Atmosphere].`
+- **Rule:** Only describe the **CHANGE**. Do not re-describe the static scene of the [ad]; only describe what moves.
+- **Anchor:** Use "this [product]" to force the AI to map details from the shop image onto the video movement.
+- Use explicit camera movements: "slow push-in", "orbit/arc", "handheld tracking", "tilt up".
+- Keep motion subtle for best results with Veo.
 - Specify duration context: what happens in 4s vs 8s
+- **Multiple Inputs:** Ensure two images are passed to the model (the generated ad as the starting frame, and the product image as the detail reference).
 
 ### Multi-Provider Orchestration
 

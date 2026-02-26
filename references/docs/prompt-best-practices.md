@@ -1,265 +1,86 @@
-# Prompt Best Practices — Image & Video Generation
-
-Guide for writing prompts that produce high-quality marketing content with accurate product representation of the image included.
-
----
-
-## Golden Rule: Keep It Simple
-
-> [!IMPORTANT]
-> **Simpler prompts produce better product accuracy.** Over-describing the product confuses the AI model. Instead, let the reference images do the heavy lifting and keep your text prompt focused on the **scene, setting, and action**.
-
-**Best prompt pattern:**
-```
-[Aspect Ratio]. [Scene naturally referencing "this [product type]"]. [Optional mood/lighting].
-```
-
-The word **"this"** tells the AI to use the attached reference image as the product. Embed **"this t-shirt"**, **"this hoodie"**, **"this cap"** etc. naturally in the sentence.
-
-**Example — Great (natural embedding):**
-```
-9:16. Create a picture of a child playing on a playground wearing this t-shirt.
-```
-
-**Example — Bad (over-described):**
-```
-9:16. A 6-year-old child wearing the Bluebullfly Kids Cotton T-Shirt with an all-over
-repeating pattern of blue cartoon butterflies with yellow smiley faces, each butterfly
-has 4 rounded blue wings... DO NOT MODIFY THE SHIRT DESIGN...
-```
-
-The simple version produces **more accurate** product reproduction because the AI focuses on matching the reference image rather than trying to interpret a complex text description.
+# Blubullfly: Master Prompting Guide (Nano Banana Pro & Veo 3.1)
+**Goal:** High-accuracy product representation for mass-market North American sales.
 
 ---
 
-## 1. Image Prompts (Nano Banana / Nano Banana Pro)
+## 🏆 The Golden Rule: Reference, Don't Describe
+**Never describe colors, patterns, or logos of the product in text.** The AI uses the attached reference image for those details. Describing them in the prompt creates "Prompt Leakage," leading to design errors.
 
-### Structure
+**The Magic Phrase:** Always use **"this [product category]"** (e.g., "this t-shirt", "this hoodie"). This "locks" the AI onto the reference image.
 
-Every image prompt should follow this order:
+### Product Categories 
+* T-Shirt
+* Hoodie
+* Cap
+* Mug
+* Sticker
 
-```
-[Aspect Ratio]. [Scene naturally referencing "this [product]"]. [Optional mood/lighting].
-```
-
-**Examples:**
-```
-9:16. Create a picture of a child playing on a playground wearing this t-shirt.
-```
-```
-4:5. An aesthetic flat-lay overhead shot on a rustic wooden table featuring this cap, this mug, and this sticker. Warm sunbeams.
-```
-```
-9:16. A young man in a dark bedroom mirror selfie wearing this hoodie.
-```
-
-### Aspect Ratio (ALWAYS First)
-
-Start every prompt with the aspect ratio followed by a period:
-- `9:16.` — Vertical (Instagram Reels, TikTok, YouTube Shorts, Stories)
-- `4:5.` — Portrait (Instagram Feed, LinkedIn)
-- `1:1.` — Square (Instagram Feed, Twitter)
-- `16:9.` — Landscape (YouTube, website banners)
-- `3:4.` — Tall portrait (Pinterest)
-
-### Reference Images
-
-Always attach the **product photo** (not the logo) as the reference image. The prompt should reference it naturally using **"this [product type]"**.
-
-> [!TIP]
-> Do NOT describe product details (colors, patterns, logos) in the text prompt. The reference image already contains all that information. Adding text descriptions of the product **conflicts** with the reference and produces worse results.
-
-### Subject Description
-
-Be specific about the person:
-- **Age range**: "early 20s", "late 30s"
-- **Style/vibe**: "streetwear", "minimalist", "athleisure"
-- **Body language**: "relaxed lean", "power stance", "mid-stride", "looking over shoulder"
-- **Facial expression**: "subtle smirk", "focused determination", "genuine laugh"
-
-### Image Types & Their Prompts
-
-#### UGC / Selfie Style (~30% of campaign)
-```
-9:16. A young woman filming herself in a bathroom mirror wearing this t-shirt,
-phone visible in frame, authentic social media aesthetic.
-```
-
-**Tips:**
-- Include the phone in the shot
-- Natural/imperfect lighting (ring lights, window light)
-- Slightly messy, real environments
-- Eye contact with camera
-
-#### Studio Hero Shot (~25% of campaign)
-```
-9:16. Male model standing on grey concrete floor wearing this hoodie, full body shot,
-dramatic moody lighting.
-```
-
-**Tips:**
-- Clean, minimal backdrops (grey, concrete, white)
-- Dramatic lighting (side-lit, rim-lit, high-contrast)
-- Strong poses (power stance, hands in pockets, looking away)
-
-#### Close-up Detail (~15% of campaign)
-```
-4:5. Close-up detail shot of this t-shirt focusing on fabric and stitching,
-shallow depth of field.
-```
-
-**Tips:**
-- Specify which detail: zipper, stitching, hardware, logo, fabric texture
-- Use "shallow depth of field" and "macro" keywords
-- 4:5 or 1:1 ratios work best for detail shots
-
-#### Urban Lifestyle (~15% of campaign)
-```
-9:16. Young man walking through a city street wearing this t-shirt,
-candid street photography.
-```
-
-**Tips:**
-- Gritty urban settings: parking garages, alleys, rooftops, subway stations
-- Motion blur adds dynamism
-- Neon/fluorescent/street lights for mood
-
-#### CGI / World-Building (~10% of campaign)
-```
-9:16. This t-shirt displayed on a mannequin in a futuristic setting,
-volumetric lighting, cinematic render.
-```
-
-**Tips:**
-- Use "render", "CGI", "3D", "volumetric lighting" for quality cues
-- Match the brand aesthetic (cyberpunk, minimal, brutalist)
-- Product can be on a mannequin or floating
-
-#### Flat Lay / Product (~5% of campaign)
-```
-4:5. Flat-lay overhead shot of this t-shirt on a rustic wooden table, warm sunbeams.
-```
-
-**Tips:**
-- Overhead angle always
-- Complementary accessories that match the brand
-- Clean, textured surfaces (marble, wood, concrete, slate)
-
-### Lighting Keywords
-
-| Keyword | Effect |
-|---------|--------|
-| "natural lighting" | Soft, authentic, outdoor feel |
-| "golden hour" | Warm, flattering, sunset tones |
-| "moody lighting" | Dark, dramatic, high contrast |
-| "studio lighting" | Clean, professional, even |
-| "neon glow" | Colorful, urban, nightlife |
-| "rim lighting" | Edge-lit silhouette, dramatic |
-| "overhead fluorescent" | Industrial, gritty, green tint |
-| "LED backlighting" | Modern, tech-forward, colorful |
-
-### Emotional Direction
-
-Always include emotional context:
-- "excited energy" — jumping, laughing, animated gestures
-- "calm confidence" — relaxed pose, steady gaze, minimal movement
-- "mysterious" — turned away, shadows on face, looking down
-- "casual cool" — one hand in pocket, slight smirk
-- "powerful" — wide stance, arms crossed, direct eye contact
 
 ---
 
-## 2. Video Prompts (Veo 3.1)
+## 1. Image Generation (Nano Banana Pro)
 
-### Structure
+### Prompt Structure
+`[Aspect Ratio]. [Scene naturally referencing "this product category"]. [Subject Details]. [Lighting/Mood].`
 
-```
-[Motion Description]. [Camera Movement]. [Atmosphere/Mood].
-```
+### Step 1: Aspect Ratio (Must be first)
+* `9:16.` — Vertical (TikTok, Reels, Shorts)
+* `4:5.` — Portrait (Instagram/Facebook Feed)
+* `1:1.` — Square (Standard Feed)
+* `16:9.` — Landscape (Website banners)
 
-**Example:**
-```
-Starting from the image, the person slowly turns toward the camera with a confident smirk.
-Slow push-in camera movement. Moody atmosphere with subtle lens flare.
-```
+### Step 2: High-Volume Scene Templates
+| Style | Prompt Formula |
+| :--- | :--- |
+| **UGC/Selfie** | `A mirror selfie wearing this hoodie, clean bedroom background, authentic social media vibe.` |
+| **Active Lifestyle**| `A child playing tag on a sunny playground wearing this t-shirt. Candid action shot.` |
+| **Studio Hero** | `Professional model standing against a grey concrete wall wearing this hoodie. High-fashion pose.` |
+| **Urban/Street** | `A teenager walking through a colorful city street wearing this t-shirt. Street photography.` |
 
-### Key Principles
+---
 
-1. **Reference the source image**: Always start with "Starting from the image..." so Veo knows to animate from the Generated Image
-2. **Subtle motion wins**: Veo produces better results with controlled, intentional movement rather than chaotic action
-3. **Describe what CHANGES**: Don't re-describe the static scene — describe what moves
-4. **Camera movement matters**: Specify one clear camera motion
+## 2. Audience & Brand Guardrails (North America)
+
+### 🌎 Diversity Logic (Canada/US Blend)
+When generating a batch of images for a campaign, rotate the subject's ethnicity to match the North American market:
+* **60% Caucasian** (e.g., "a person with fair skin")
+* **20% Hispanic/Latino** (e.g., "a person with olive skin/Hispanic heritage")
+* **15% Black/African American** (e.g., "a person with dark skin/African heritage")
+* **5% Asian** (e.g., "a person with East Asian features")
+
+### 🚫 Brand "No-Go" Zones
+To maintain a high-end commercial feel, the agent must avoid:
+* **Messy Environments:** No cluttered backgrounds or piles of clothes in "UGC" shots.
+* **Competing Logos:** Ensure the background doesn't contain visible logos of other brands.
+* **Complex Text:** Do not request text on the clothes or "SALE" signs; Nano Banana struggles with text.
+* **Political/Religious Symbols:** Keep environments neutral (playgrounds, parks, clean studios, city streets).
+
+---
+
+## 3. Video Generation (Veo 3.1)
+
+### The Two-Image Visual Anchor
+For maximum accuracy, provide two visual inputs to the AI:
+1. **The [ad]**: The approved Generated Image from Section 1 (serves as the starting frame).
+2. **The [shop image]**: The original high-res product photo (serves as the detail reference).
+
+### The "Product-First" Video Formula
+`Starting from the [ad], the subject wearing **this [product]** [Motion Description]. [Camera Movement]. [Atmosphere].`
+
+* **Rule:** Only describe the **CHANGE**. Do not re-describe the static scene of the [ad]; only describe what moves.
+* **Rule:** Anchor to the product. Use "this [product]" to force the AI to map details from the shop image onto the video movement.
 
 ### Camera Movement Keywords
-
-| Keyword | Effect |
-|---------|--------|
-| "slow push-in" | Slowly zooming toward subject — builds intensity |
-| "dolly zoom" | Subject stays same size while background shifts — dramatic |
-| "orbit / arc" | Camera circles around subject — reveals product from angles |
-| "handheld tracking" | Follows subject walking — casual, documentary feel |
-| "static / locked off" | Camera doesn't move — focus on subject's movement |
-| "tilt up" | Camera pans from feet to head — dramatic reveal |
-| "pull back" | Camera moves away — reveals environment |
-
-### Duration Guidelines
-
-| Duration | Best For |
-|----------|----------|
-| 4 seconds | Quick hooks, single motion, detail shots |
-| 6 seconds | Standard reveal, turn + pose, walk-and-stop |
-| 8 seconds | Full scene, walk + pause + turn, multi-motion |
-
-### Video Prompt Examples by Type
-
-#### Product Reveal (4s)
-```
-Starting from the image, the t-shirt slowly rotates on the mannequin.
-Camera doing a gentle orbit. Studio spotlights creating dynamic shadows.
-```
-
-#### UGC Style (6s)
-```
-Starting from the image, the person raises their phone for a selfie video,
-gives a slight nod to camera. Handheld camera feel with slight shake.
-```
-
-#### Lifestyle Walk (8s)
-```
-Starting from the image, the person pushes off the wall and walks toward
-the camera. Slow tracking shot following their stride.
-```
-
-#### Dramatic Hero (6s)
-```
-Starting from the image, wind begins blowing the fabric.
-The person slowly looks up toward the camera with intense eye contact.
-Slow push-in. Cinematic lens flare from the right.
-```
+* **Slow push-in:** Builds focus on the product.
+* **Orbit / Arc:** Circles the subject to reveal the product from different angles.
+* **Handheld tracking:** Creates a casual, documentary/UGC feel.
+* **Tilt up:** A dramatic reveal from feet to head.
 
 ---
 
-## 3. Model-Specific Tips
-
-### Nano Banana Pro (Images)
-- **Keep prompts short** — simpler prompts produce better product accuracy
-- Reference the product naturally: **"this t-shirt"**, **"this hoodie"**, etc.
-- Do NOT describe product details in text — let the reference image do the work
-- 9:16 and 4:5 produce the sharpest results
-- Struggles with readable text/brand names — avoid requesting text overlays
-
-### Veo 3.1 (Videos)
-- Image-to-video produces more consistent results than text-to-video
-- Best motion: hair/fabric blowing, slow turns, walking, subtle gestures
-- Avoid: fast action, complex multi-person scenes, precise hand movements
-- Always generate the image first, approve it, THEN generate the video from it
-- Videos are ~$0.50 each — be selective about which posts get video
-
----
-
-## 4. Campaign Consistency
-
-- Use the same reference images across all prompts for product consistency
-- Reference the product naturally with **"this [product]"** in every prompt
-- Vary **settings, lighting, and action** — NOT the product appearance
-- Mix indoor/outdoor settings for variety
+## 4. Implementation Logic (Sets & Safety)
+* **Product Consistency:** Use the exact same reference image for the Image and the Video for product consistency.
+* **Multiple Products:** If a set is required in the future, reference both naturally: "A person wearing **this cap** and **this t-shirt**."
+* **Environment Logic:** Ensure the background matches the item (e.g., no winter jackets on a beach).
+* **Text:** Nano Banana struggles with text; do not ask for words like "SALE" or "NEW" on the clothes.
+* **No-Go Zones:** Avoid messy rooms, political/religious symbols, or competing brand logos in backgrounds.
