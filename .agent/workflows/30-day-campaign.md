@@ -138,7 +138,7 @@ python -c "
 import sys; sys.path.insert(0, '.')
 from dotenv import load_dotenv; load_dotenv('references/.env')
 from tools.gcp_upload import upload_references
-ref_urls = upload_references(['references/inputs/product.jpg'])
+ref_urls = upload_references(['references/[brandname]/products/product.jpg'])
 f = open('references/outputs/ref_urls.txt', 'w'); f.write('\n'.join(ref_urls)); f.close()
 print('Reference URLs saved.')
 "
@@ -233,7 +233,7 @@ from tools.image_gen import generate_batch
 records = get_pending_images()
 results = generate_batch(
     records,
-    reference_paths=["references/inputs/product_image.jpg"],
+    reference_paths=["references/[brandname]/products/product_image.jpg"],
     model="nano-banana-pro",
     provider="google",
     num_variations=1,  # or 2 if user chose 2

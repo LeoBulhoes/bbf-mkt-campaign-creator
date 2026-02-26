@@ -19,6 +19,8 @@ Bluebullfly creates trendy, high-quality kids and youth apparel — from everyda
 - **Tertiary**: Teens and young adults who gravitate to fun, colorful apparel
 - **Demographics**: Canada-based, digitally active, value quality + fun design
 - **Pain Points**: Kids outgrow clothes fast → need affordable quality; boring kids clothes → want something unique and fun
+- **Their Desire**: To find stylish, durable, and affordable clothing that their kids actually *want* to wear, while feeling like they made a smart purchase.
+- **Where they hang out**: Facebook parenting groups, TikTok & Instagram (following mom-influencers and children's fashion tags), Pinterest boards for kids' outfits and back-to-school prep.
 
 ## Visual Identity
 
@@ -97,6 +99,25 @@ Navy, Purple, Maroon, Forest Green, Royal, Orange, Gold, Carolina Blue, Light Pi
 - **Not corporate** — casual, approachable
 - **Emoji-friendly** — 🦋 💪 ☀️ 🎒
 
+| Attribute | Description |
+| --------- | ----------- |
+| Formality | Casual and approachable, like talking to another parent at the park. |
+| Energy | Energetic and fun, matching the boundless energy of kids! |
+| Humor | Lighthearted and witty, but never sarcastic or mocking. |
+| Warmth | Extremely warm and encouraging; supportive of kids being kids. |
+
+### Signature Phrases
+- "Play All Day. Built to Last."
+- "Ready for action!"
+- "Cozy Warmth. Built for School."
+- "Everyday Adventures"
+
+### What We NEVER Do
+- ❌ **No Guilt-Tripping:** Never make parents feel bad about their choices or messy kids.
+- ❌ **No Overly Complex Jargon:** Keep it simple—no deep dives into fabric science unless it clearly explains a benefit (like "No chafing").
+- ❌ **No Tween/Teen Slang:** Avoid trendy internet slang that might isolate parents or feel forced.
+- ❌ **No High-Fashion Pretension:** Keep it grounded. We aren't a luxury runway brand; we are for the playground.
+
 ## Content Pillars
 
 1. **Adventure Ready** — Kids playing, exploring, being active
@@ -123,14 +144,14 @@ All product mockup images available via Shopify CDN — see `products/products_e
 
 ## Competitors / Inspiration
 
-- Primary Clothing Kids (high-quality kids apparel)
-- Carter's / OshKosh (mass market kids)
-- Print-on-demand brands on Etsy/Amazon
+- Primary Clothing Kids (high-quality kids apparel) — *What we take: Focus on vibrant colors and durability, but we add more playful character graphics.*
+- Carter's / OshKosh (mass market kids) — *What we take: Approachable pricing and staple items, but we aim for a unique, "less generic" look.*
+- Print-on-demand brands on Etsy/Amazon — *What we take: Endless variety and fun niche designs, but with higher consistent quality.*
 
 ## Social Media Platforms (target)
 
-- **Instagram** (Reels + Feed) — PRIMARY
-- **TikTok** — SHORT-FORM VIDEO
-- **YouTube Shorts** — SHORT-FORM VIDEO
-- **Facebook** — PARENT DEMOGRAPHIC
-- **Pinterest** — DISCOVERY / INSPIRATION
+- **Instagram** (Reels + Feed) — PRIMARY (1-2 posts daily; mix of product close-ups, lifestyle, and behind-the-scenes)
+- **TikTok** — SHORT-FORM VIDEO (1-2 posts daily; focus on active lifestyle and "action" shots)
+- **YouTube Shorts** — SHORT-FORM VIDEO (Repurpose TikToks)
+- **Facebook** — PARENT DEMOGRAPHIC (1 post daily; focus on quality, durability, and promotions)
+- **Pinterest** — DISCOVERY / INSPIRATION (Pin new products as they drop)
