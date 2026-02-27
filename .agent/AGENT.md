@@ -6,7 +6,6 @@ You are a Creative Content Engine. You create visual ad campaigns at scale — f
 - **Image Generation**: Nano Banana Pro via Google AI Studio (`tools/image_gen.py`)
 - **Video Generation**: Veo 3.1 via Google AI Studio (`tools/video_gen.py`)
 - **Asset Hub**: Airtable REST API (`tools/airtable.py`)
-- **Reference Upload**: Kie.ai file hosting (`tools/kie_upload.py`)
 - **Social Scheduling**: Blotato MCP server (Optional — if `BLOTATO_API_KEY` is missing, switch to **Manual Mode**)
 - **Cloud Automation**: Modal.com (see `.agent/skills/modal_deployment/`)
 
@@ -20,7 +19,6 @@ Walk the user through:
    ```
 2. Copy `references/.env.example` to `references/.env` and fill in API keys:
    - `GOOGLE_API_KEY` — from https://aistudio.google.com/apikey (for image + video generation)
-   - `KIE_API_KEY` — from https://kie.ai/api-key (for file hosting / reference image uploads)
    - `AIRTABLE_API_KEY` — Airtable PAT with scopes: `data.records:read`, `data.records:write`, `schema.bases:read`, `schema.bases:write`
    - `AIRTABLE_BASE_ID` — from the Airtable base URL (`appXXXXXX`)
    - `BLOTATO_API_KEY` — from https://my.blotato.com → API settings
@@ -77,7 +75,6 @@ tools/                 - Python tools & scripts
   __init__.py          - Package init
   config.py            - API keys, endpoints, constants
   airtable.py          - Airtable CRUD operations
-  kie_upload.py        - Upload files to Kie.ai hosting
   image_gen.py         - Image generation (multi-provider)
   video_gen.py         - Video generation (multi-provider)
   utils.py             - Polling, downloads, status printing
@@ -171,7 +168,7 @@ Videos are generated **from approved images** (image-to-video pipeline):
 1. **Prerequisite**: Image must exist in `Generated Image 1` field and have `Image Status = "Approved"` or `"Generated"`
 2. **Video Prompt**: Must be set in the record's `Video Prompt` field
 3. **Generation**: The source image becomes the first frame; Veo animates it based on the prompt
-4. **Output**: Video URL uploaded to Kie.ai, attached to `Generated Video 1/2`, status updated
+4. **Output**: Video URL attached to `Generated Video 1/2` in Airtable, status updated
 
 ```python
 # Generate videos for all pending records
@@ -229,12 +226,8 @@ python -c "import sys; sys.path.insert(0, '.'); from dotenv import load_dotenv; 
 
 - Always use `sys.path.insert(0, '.')` before importing `tools` modules when running from the project root
 - Always `from dotenv import load_dotenv; load_dotenv('references/.env')` to load API keys
-- Reference images uploaded to Kie.ai expire after 3 days
 - Airtable batch operations are limited to 10 records per request (handled automatically)
 - Always confirm costs with the user before batch generation
-- Generated assets from Google are uploaded to Kie.ai hosting to get URLs for Airtable
-- When creating Airtable records, ALWAYS upload reference images first (via `kie_upload`) and attach them in the record's `Reference Images` field at creation time
-- **Video generation takes longer than images** — expect 2-5 minutes per video. Be patient with polling.
 - **Videos need a source image** — always generate and approve images BEFORE generating videos
 
 ### Caption Guidelines

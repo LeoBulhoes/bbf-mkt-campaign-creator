@@ -1,8 +1,7 @@
 """
 Provider registry and routing for image and video generation.
 
-Multi-provider architecture — routes to Google AI Studio (default),
-Kie AI, or WaveSpeed based on model + provider selection.
+Logic routes to Google AI Studio or WaveSpeed based on model selection.
 
 Usage:
     from tools.providers import get_image_provider, get_video_provider, is_sync

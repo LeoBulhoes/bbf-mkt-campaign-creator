@@ -83,17 +83,14 @@ def _upload_base64_to_host(base64_data, filename="generated.png"):
 # Image Generation (Synchronous)
 # ---------------------------------------------------------------------------
 
-def submit_image(prompt, reference_paths=None, aspect_ratio="9:16",
+def submit_image(prompt, image_urls=None, aspect_ratio="9:16",
                  resolution="1K", model="nano-banana-pro", **kwargs):
     """
     Generate an image synchronously via Google AI Studio.
 
-    Unlike Kie AI, this returns the final GenerationResult directly
-    (no task_id, no polling needed).
-
     Args:
         prompt: Image generation prompt
-        reference_paths: List of LOCAL file paths (base64-encoded inline)
+        image_urls: List of URLs for visual anchors (Product Consistency)
         aspect_ratio: Standard ratio string (e.g., "9:16")
         resolution: "1K", "2K", or "4K"
         model: "nano-banana" or "nano-banana-pro"
@@ -105,14 +102,22 @@ def submit_image(prompt, reference_paths=None, aspect_ratio="9:16",
     if not google_model:
         raise ValueError(f"Google doesn't support image model: '{model}'")
 
-    # Build parts: text prompt + optional reference images as inline base64
+    # Build parts: text prompt + anchor images as inline base64
     parts = [{"text": prompt}]
-    if reference_paths:
-        for ref_path in reference_paths:
-            b64_data, mime_type = _encode_image_base64(ref_path)
-            parts.append({
-                "inline_data": {"mime_type": mime_type, "data": b64_data}
-            })
+
+    # Handle URLs (Airtable/Hosted)
+    if image_urls:
+        for url in image_urls:
+            try:
+                ref_resp = requests.get(url, timeout=60)
+                ref_resp.raise_for_status()
+                b64 = base64.b64encode(ref_resp.content).decode("utf-8")
+                mtype = ref_resp.headers.get("content-type", "image/jpeg")
+                parts.append({
+                    "inline_data": {"mime_type": mtype, "data": b64}
+                })
+            except Exception as e:
+                print_status(f"Warning: Failed to download image URL {url[:40]}...: {e}", "!!")
 
     payload = {
         "contents": [{"parts": parts}],
@@ -159,20 +164,22 @@ def poll_image(task_id, **kwargs):
 # Video Generation (Asynchronous — Veo 3.1)
 # ---------------------------------------------------------------------------
 
-def submit_video(prompt, image_url=None, model="veo-3.1",
-                 duration="8", aspect_ratio="9:16", resolution="720p",
-                 image_path=None, **kwargs):
+_VIDEO_MODELS = {
+    "veo-3.1": "veo-3.1-generate-preview",
+}
+
+def submit_video(prompt, image_urls=None, model="veo-3.1",
+                 duration="8", aspect_ratio="9:16", resolution="720p", **kwargs):
     """
     Submit a video generation task to Google Veo 3.1.
 
     Args:
         prompt: Video prompt text
-        image_url: URL of source image (will be downloaded + base64-encoded)
+        image_urls: List of URLs. First is starting frame, rest are anchors.
         model: "veo-3.1"
         duration: "4", "6", or "8" seconds
         aspect_ratio: "9:16" or "16:9"
         resolution: "720p", "1080p", or "4k"
-        image_path: Local path to source image (alternative to image_url)
 
     Returns:
         str: operation_name for polling
@@ -183,22 +190,39 @@ def submit_video(prompt, image_url=None, model="veo-3.1",
 
     # Build instance
     instance = {"prompt": prompt}
+    payload_images = {}
+    anchors = []
 
-    # Attach source image for image-to-video
-    if image_path:
-        b64_data, mime_type = _encode_image_base64(image_path)
-        instance["image"] = {"bytesBase64Encoded": b64_data, "mimeType": mime_type}
-    elif image_url:
-        img_response = requests.get(image_url, timeout=60)
-        img_response.raise_for_status()
-        b64_data = base64.b64encode(img_response.content).decode("utf-8")
-        content_type = img_response.headers.get("content-type", "image/png")
-        instance["image"] = {"bytesBase64Encoded": b64_data, "mimeType": content_type}
+    # Handle image list
+    # Veo 3.1 image format: use bytesBase64Encoded (NOT inlineData) for REST API.
+    # First image is the start frame (instances[0].image).
+    # Additional images (referenceImages) are not currently available for this API plan.
+    if image_urls:
+        for i, url in enumerate(image_urls):
+            try:
+                resp = requests.get(url, timeout=60)
+                resp.raise_for_status()
+                b64 = base64.b64encode(resp.content).decode("utf-8")
+                mtype = resp.headers.get("content-type", "image/jpeg").split(";")[0].strip()
 
-    # Veo 3.1 only accepts 4, 6, or 8 seconds — snap to nearest valid value
+                if i == 0:
+                    # First image: starting frame in instances
+                    instance["image"] = {"bytesBase64Encoded": b64, "mimeType": mtype}
+                else:
+                    # Skip additional images — referenceImages not available on this plan
+                    print_status(f"Note: Skipping extra image {i} (referenceImages not available on this plan)", "!!")
+            except Exception as e:
+                print_status(f"Warning: Failed to download URL {url[:40]}...: {e}", "!!")
+
+    # Veo 3.1 only accepts 4, 6, or 8 seconds
     valid_durations = [4, 6, 8]
     dur = int(duration)
     dur = min(valid_durations, key=lambda v: abs(v - dur))
+
+    # image-to-video requires personGeneration=allow_adult and duration=8s
+    has_image = "image" in instance
+    if has_image:
+        dur = 8
 
     payload = {
         "instances": [instance],
@@ -208,6 +232,9 @@ def submit_video(prompt, image_url=None, model="veo-3.1",
             "sampleCount": 1,
         },
     }
+
+    if has_image:
+        payload["parameters"]["personGeneration"] = "allow_adult"
 
     url = _PREDICT_URL.format(model=google_model)
     response = requests.post(url, headers=_headers(), json=payload, timeout=120)
@@ -226,7 +253,7 @@ def submit_video(prompt, image_url=None, model="veo-3.1",
 def poll_video(operation_name, max_wait=600, poll_interval=10, quiet=False):
     """
     Poll a Google Veo operation until completion.
-    Downloads the result video and uploads to Kie.ai for hosting.
+    Downloads the result video and uploads to a cloud hosting service.
 
     Args:
         operation_name: The operation name from submit_video
@@ -268,7 +295,7 @@ def poll_video(operation_name, max_wait=600, poll_interval=10, quiet=False):
             if not video_uri:
                 raise Exception(f"No video URI in Veo response: {samples[0]}")
 
-            # Download video (requires API key auth) and upload to Kie.ai
+            # Download video (requires API key auth) and upload to GCS/Airtable
             hosted_url = _download_and_host_video(video_uri)
 
             if not quiet:
@@ -291,7 +318,7 @@ def poll_video(operation_name, max_wait=600, poll_interval=10, quiet=False):
 
 
 def _download_and_host_video(video_uri):
-    """Download a Veo video (requires API key) and upload to Kie.ai hosting."""
+    """Download a Veo video (requires API key) and upload to GCP hosting."""
     tmp_path = os.path.join(tempfile.gettempdir(), f"veo_video_{uuid.uuid4().hex[:8]}.mp4")
 
     response = requests.get(video_uri, headers=_headers(), stream=True, timeout=120)

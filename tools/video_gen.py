@@ -27,7 +27,7 @@ _MODEL_DISPLAY_NAMES = {
 _AIRTABLE_TO_INTERNAL = {v: k for k, v in _MODEL_DISPLAY_NAMES.items()}
 
 
-def generate_video(prompt, image_url=None, image_path=None,
+def generate_video(prompt, image_urls=None,
                    aspect_ratio="9:16", duration="8", resolution="720p",
                    model=None, provider=None):
     """
@@ -35,8 +35,7 @@ def generate_video(prompt, image_url=None, image_path=None,
 
     Args:
         prompt: Video generation prompt
-        image_url: URL of source image (start frame)
-        image_path: Local path to source image (alternative to image_url)
+        image_urls: List of URLs. First is start frame, rest are anchors.
         aspect_ratio: "9:16" or "16:9"
         duration: "4", "6", or "8" seconds
         resolution: "720p", "1080p", or "4k"
@@ -50,14 +49,13 @@ def generate_video(prompt, image_url=None, image_path=None,
     provider_module, provider_name = get_video_provider(model, provider)
 
     print_status(f"Generating video via {provider_name} ({model})...")
-    if image_url:
-        print_status(f"Using source image: {image_url[:60]}...")
-    elif image_path:
-        print_status(f"Using source image: {image_path}")
+    if image_urls:
+        print_status(f"Using {len(image_urls)} image URL(s) (start + anchors)")
 
     # Submit video task
     operation_id = provider_module.submit_video(
-        prompt, image_url=image_url, image_path=image_path,
+        prompt, 
+        image_urls=image_urls,
         model=model, duration=duration, aspect_ratio=aspect_ratio,
         resolution=resolution,
     )
@@ -74,7 +72,7 @@ def generate_for_record(record, model=None, provider=None,
     Generate video variation(s) for a single Airtable record.
 
     Uses the record's 'Video Prompt' and 'Generated Image 1' (as start frame).
-    Updates 'Generated Video 1/2', 'Video Status', and 'Video Model' in Airtable.
+    Also attaches 'Reference Images' from Airtable as anchors for consistency.
 
     Args:
         record: Airtable record dict (with 'id' and 'fields')
@@ -100,11 +98,15 @@ def generate_for_record(record, model=None, provider=None,
         print_status(f"Skipping '{ad_name}' - no Video Prompt set", "!!")
         return None
 
-    # Get source image from Generated Image 1
-    image_url = None
+    # Combined image list: [Start Frame, Anchor 1, Anchor 2, ...]
+    image_urls = []
+    
     gen_images = fields.get("Generated Image 1", [])
-    if gen_images and isinstance(gen_images, list):
-        image_url = gen_images[0].get("url")
+    if gen_images:
+        image_urls.append(gen_images[0].get("url"))
+
+    ref_attachments = fields.get("Reference Images", [])
+    image_urls.extend([at.get("url") for at in ref_attachments if at.get("url")])
 
     num_variations = max(1, min(2, num_variations))
     var_range = range(1, num_variations + 1)
@@ -114,8 +116,8 @@ def generate_for_record(record, model=None, provider=None,
     print_status(f"Duration: {duration}s")
     print_status(f"Resolution: {resolution}")
     print_status(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
-    if image_url:
-        print_status(f"Source image: {image_url[:60]}...")
+    if image_urls:
+        print_status(f"Source image: {image_urls[0][:60]}...")
 
     results = []
 
@@ -124,7 +126,7 @@ def generate_for_record(record, model=None, provider=None,
     for var_num in var_range:
         print_status(f"Submitting variation {var_num}/{num_variations}...")
         op_id = provider_module.submit_video(
-            prompt, image_url=image_url,
+            prompt, image_urls=image_urls,
             model=model, duration=duration,
             aspect_ratio=aspect_ratio, resolution=resolution,
         )
@@ -187,6 +189,7 @@ def generate_batch(records, model=None, provider=None,
 
     Respects each record's 'Video Model' field from Airtable.
     Uses 'Generated Image 1' as the source frame for each video.
+    Attaches 'Reference Images' from Airtable for product consistency.
 
     Args:
         records: List of Airtable record dicts
@@ -249,11 +252,14 @@ def generate_batch(records, model=None, provider=None,
         fields = record.get("fields", {})
         ad_name = fields.get("Ad Name", "untitled")
 
-        # Get source image
-        image_url = None
+        # Combined image list
+        image_urls = []
         gen_images = fields.get("Generated Image 1", [])
-        if gen_images and isinstance(gen_images, list):
-            image_url = gen_images[0].get("url")
+        if gen_images:
+            image_urls.append(gen_images[0].get("url"))
+
+        ref_attachments = fields.get("Reference Images", [])
+        image_urls.extend([at.get("url") for at in ref_attachments if at.get("url")])
 
         prompt = fields.get("Video Prompt", "")
         rec_model, rec_pmod, rec_pname = record_models[record["id"]]
@@ -263,7 +269,7 @@ def generate_batch(records, model=None, provider=None,
             print_status(f"Submitting: {ad_name} (variation {var_num}) [{display_model} via {rec_pname}]")
             try:
                 op_id = rec_pmod.submit_video(
-                    prompt, image_url=image_url,
+                    prompt, image_urls=image_urls,
                     model=rec_model, duration=duration,
                     aspect_ratio=aspect_ratio, resolution=resolution,
                 )
@@ -330,7 +336,14 @@ def generate_batch(records, model=None, provider=None,
 
         if record_ok:
             succeeded += 1
-        results.append(update_fields if update_fields else None)
+        
+        # Ensure we return a useful record object for the caller
+        summary = {
+            "ad_name": ad_name,
+            "status": "success" if record_ok else "error",
+            "updates": update_fields
+        }
+        results.append(summary)
 
     print(f"\n{'=' * 50}")
     print(f"  Batch complete: {succeeded}/{count} records ({videos_generated} videos)")

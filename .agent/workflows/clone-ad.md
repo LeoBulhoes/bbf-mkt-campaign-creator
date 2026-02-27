@@ -82,7 +82,7 @@ Read references/[brandname]_BRAND.md for voice, audience, pillars, and visual st
 python -c "
 import sys; sys.path.insert(0, '.')
 from dotenv import load_dotenv; load_dotenv('references/.env')
-from tools.kie_upload import upload_references
+from tools.gcp_upload import upload_references
 ref_urls = upload_references(['references/[brandname]/products/product.jpg'])
 f = open('references/outputs/ref_urls.txt', 'w'); f.write('\n'.join(ref_urls)); f.close()
 print('Reference URLs saved.')
@@ -117,9 +117,9 @@ Use `create_records_batch` to create one record per scene:
 ```python
 {
     "Index": start_index + i,
-    "Ad Name": "Clone - Scene 1 - Hook Detail",
+    "Ad Name": f"Clone - Scene {i+1}",
     "Product": "User's Product Name",
-    "Reference Images": [{"url": ref_url}],
+    "Reference Images": [{"url": "URL_FROM_AIRTABLE_ATTACHMENT"}],
     "Image Prompt": "9:16. Extreme close-up of product zipper...",
     "Image Model": "Nano Banana Pro",
     "Image Status": "Pending",
@@ -165,7 +165,6 @@ from tools.image_gen import generate_batch
 records = get_pending_images()
 results = generate_batch(
     records,
-    reference_paths=["references/[brandname]/products/product.jpg"],
     model="nano-banana-pro",
     provider="google",
     num_variations=1,
@@ -216,7 +215,7 @@ results = generate_batch(
 
 ### Manual Mode (If no Blotato API Key)
 If `BLOTATO_API_KEY` is missing:
-1. Provide the user with the Final Image/Video download links from Kie.ai.
+1. Provide the user with the Final Image/Video download links directly from Airtable.
 2. Provide the matching captions.
 3. Instruct the user to post manually to their preferred platforms.
 

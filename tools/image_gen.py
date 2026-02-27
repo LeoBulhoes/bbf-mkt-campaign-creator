@@ -1,12 +1,14 @@
 """
 Image generation module — multi-provider.
-Routes to Google AI Studio (default) or Kie AI based on model/provider selection.
+Routes to Google AI Studio (default) or WaveSpeed based on model selection.
+Optimized for BlueBullFly brand marketing.
 
-Supports:
-- Nano Banana (Google: gemini-2.5-flash-image, Kie: nano-banana-pro)
-- Nano Banana Pro (Google: gemini-3-pro-image-preview, Kie: nano-banana-pro)
-
-Google is synchronous (no polling). Kie AI is async (submit → poll).
+Supported Features:
+- Nano Banana (Google: gemini-2.5-flash-image)
+- Nano Banana Pro (Google: gemini-3-pro-image-preview)
+- GPT Image 1.5 (WaveSpeed: image-to-image)
+- Airtable Integration (Reading prompts/anchors, writing results)
+.
 """
 
 import time
@@ -37,7 +39,7 @@ def _detect_aspect_ratio(prompt):
     return "9:16"
 
 
-def generate_ugc_image(prompt, reference_paths=None, reference_urls=None,
+def generate_ugc_image(prompt, image_urls=None,
                        aspect_ratio="9:16", resolution="1K",
                        model=None, provider=None):
     """
@@ -45,8 +47,7 @@ def generate_ugc_image(prompt, reference_paths=None, reference_urls=None,
 
     Args:
         prompt: Image generation prompt
-        reference_paths: Local file paths (used by Google provider)
-        reference_urls: Hosted URLs (used by Kie AI provider)
+        image_urls: Hosted URLs for visual anchors (Airtable-centric)
         aspect_ratio: Aspect ratio string
         resolution: "1K", "2K", or "4K"
         model: Image model name (default: config.DEFAULT_IMAGE_MODEL)
@@ -60,42 +61,38 @@ def generate_ugc_image(prompt, reference_paths=None, reference_urls=None,
     sync = is_sync(provider_module, "image")
 
     print_status(f"Generating image via {provider_name} ({model})...")
-    if reference_paths:
-        print_status(f"Using {len(reference_paths)} reference image(s)")
-    elif reference_urls:
-        print_status(f"Using {len(reference_urls)} reference image(s)")
+    if image_urls:
+        print_status(f"Using {len(image_urls)} image URL(s) as anchors")
 
     if sync:
-        # Google: synchronous, pass local file paths
         return provider_module.submit_image(
-            prompt, reference_paths=reference_paths,
+            prompt, image_urls=image_urls,
             aspect_ratio=aspect_ratio, resolution=resolution, model=model
         )
     else:
-        # Kie AI: async, pass hosted URLs
+        # Async: submit, then poll
         task_id = provider_module.submit_image(
-            prompt, reference_urls=reference_urls,
+            prompt, image_urls=image_urls,
             aspect_ratio=aspect_ratio, resolution=resolution, model=model
         )
         print_status(f"Task created: {task_id}", "OK")
         return provider_module.poll_image(task_id, max_wait=300, poll_interval=5)
 
 
-def generate_for_record(record, reference_paths=None, reference_urls=None,
-                        model=None, provider=None, aspect_ratio=None,
-                        resolution="1K", num_variations=2):
+def generate_for_record(record, model=None, provider=None, 
+                        aspect_ratio=None, resolution="1K", num_variations=2):
     """
     Generate image variations for a single Airtable record.
 
+    Automatically extracts 'Reference Images' from Airtable as visual anchors.
+
     Args:
         record: Airtable record dict (with 'id' and 'fields')
-        reference_paths: Local file paths (for Google)
-        reference_urls: Pre-uploaded GCP hosted URLs (for Kie AI)
         model: Image model name
         provider: Provider override
-        aspect_ratio: Override aspect ratio (default: auto-detect from prompt, fallback "9:16")
+        aspect_ratio: Override aspect ratio
         resolution: Image resolution — "1K", "2K", or "4K" (default: "1K")
-        num_variations: Number of image variations to generate, 1 or 2 (default: 2)
+        num_variations: Number of image variations, 1 or 2 (default: 2)
 
     Returns:
         list of result dicts, or None if skipped
@@ -117,9 +114,15 @@ def generate_for_record(record, reference_paths=None, reference_urls=None,
     num_variations = max(1, min(2, num_variations))
     var_range = range(1, num_variations + 1)
 
+    # Get anchors from record
+    ref_attachments = fields.get("Reference Images", [])
+    image_urls = [at.get("url") for at in ref_attachments if at.get("url")]
+
     print(f"\n--- Generating {num_variations} image variation(s) for: {ad_name} ({provider_name}) ---")
     print_status(f"Aspect ratio: {effective_ratio}")
     print_status(f"Resolution: {resolution}")
+    if image_urls:
+         print_status(f"Using {len(image_urls)} image anchor(s) from Airtable")
     print_status(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
 
     results = []
@@ -128,7 +131,7 @@ def generate_for_record(record, reference_paths=None, reference_urls=None,
         for var_num in var_range:
             print_status(f"Generating variation {var_num}/{num_variations}...")
             result = provider_module.submit_image(
-                prompt, reference_paths=reference_paths,
+                prompt, image_urls=image_urls,
                 aspect_ratio=effective_ratio, resolution=resolution, model=model
             )
             results.append(result)
@@ -136,12 +139,12 @@ def generate_for_record(record, reference_paths=None, reference_urls=None,
             if var_num < num_variations:
                 time.sleep(1)
     else:
-        # Kie AI: submit all, then poll concurrently
+        # Async: submit all, then poll (e.g. for future async providers)
         task_ids = []
         for var_num in var_range:
             print_status(f"Submitting variation {var_num}/{num_variations}...")
             task_id = provider_module.submit_image(
-                prompt, reference_urls=reference_urls,
+                prompt, image_urls=image_urls,
                 aspect_ratio=effective_ratio, resolution=resolution, model=model
             )
             task_ids.append(task_id)
@@ -195,25 +198,20 @@ def _resolve_record_model(record, fallback_model=None, fallback_provider=None):
     return model, provider_module, provider_name
 
 
-def generate_batch(records, reference_paths=None, model=None, provider=None,
+def generate_batch(records, model=None, provider=None,
                    aspect_ratio=None, resolution="1K", num_variations=2):
     """
     Generate images for multiple Airtable records.
 
-    Respects each record's 'Image Model' field from Airtable. If a record has no
-    Image Model set, falls back to the `model` argument or config.DEFAULT_IMAGE_MODEL.
-
-    Routes to the appropriate provider based on per-record model selection.
-    - SYNC providers (Google): submit returns result directly, no Phase 2 polling.
-    - ASYNC providers (Kie AI): submit returns task_id, Phase 2 polls all concurrently.
+    Respects each record's 'Image Model' field from Airtable.
+    Automatically extracts 'Reference Images' from Airtable for each record.
 
     Args:
         records: List of Airtable record dicts
-        reference_paths: Local file paths for reference images
-        model: Fallback image model name (default: config.DEFAULT_IMAGE_MODEL)
-        provider: Provider override applied to all records (default: model's default)
-        aspect_ratio: Override aspect ratio for all records (default: auto-detect from prompt)
-        resolution: Image resolution — "1K", "2K", or "4K" (default: "1K")
+        model: Fallback image model name
+        provider: Provider override
+        aspect_ratio: Override aspect ratio
+        resolution: Image resolution — "1K", "2K", or "4K"
         num_variations: Images per record, 1 or 2 (default: 2)
 
     Returns:
@@ -258,13 +256,8 @@ def generate_batch(records, reference_paths=None, model=None, provider=None,
     print(f"  Total estimated cost: ${total_cost:.2f}")
     print(f"{'=' * 50}\n")
 
-    # Upload reference images for any async (Kie AI) providers
-    reference_urls = None
-    needs_async = any(not is_sync(pm, "image") for _, pm, _ in record_models.values())
-    if reference_paths and needs_async:
-        print_status("Uploading reference images to GCP (one-time)...")
-        reference_urls = upload_references(reference_paths)
-        print_status(f"Uploaded {len(reference_urls)} reference image(s)", "OK")
+    # No pre-upload phase needed for local references in batch anymore 
+    # as we pull directly from Airtable URLs per record.
 
     # --- Phase 1: Submit / Generate all images ---
     print(f"\n--- Phase 1: Generating {images_total} images ---")
@@ -282,19 +275,23 @@ def generate_batch(records, reference_paths=None, model=None, provider=None,
         rec_sync = is_sync(rec_pmod, "image")
         display_model = _MODEL_DISPLAY_NAMES.get(rec_model, rec_model)
 
+        # Get anchors from record
+        ref_attachments = fields.get("Reference Images", [])
+        image_urls = [at.get("url") for at in ref_attachments if at.get("url")]
+
         for var_num in var_range:
             print_status(f"Generating: {ad_name} (variation {var_num}) [{display_model} via {rec_pname}]")
             try:
                 if rec_sync:
                     result = rec_pmod.submit_image(
-                        prompt, reference_paths=reference_paths,
+                        prompt, image_urls=image_urls,
                         aspect_ratio=effective_ratio, resolution=resolution, model=rec_model
                     )
                     submissions.append((record, var_num, result, rec_model, rec_pmod, rec_pname, True))
                     print_status(f"Done -> {result['result_url'][:50]}...", "OK")
                 else:
                     task_id = rec_pmod.submit_image(
-                        prompt, reference_urls=reference_urls,
+                        prompt, image_urls=image_urls,
                         aspect_ratio=effective_ratio, resolution=resolution, model=rec_model
                     )
                     submissions.append((record, var_num, task_id, rec_model, rec_pmod, rec_pname, False))
@@ -371,7 +368,14 @@ def generate_batch(records, reference_paths=None, model=None, provider=None,
 
         if record_ok:
             succeeded += 1
-        results.append(update_fields if update_fields else None)
+        
+        # Ensure we return a useful record object for the caller
+        summary = {
+            "ad_name": ad_name,
+            "status": "success" if record_ok else "error",
+            "updates": update_fields
+        }
+        results.append(summary)
 
     print(f"\n{'=' * 50}")
     print(f"  Batch complete: {succeeded}/{count} records ({images_generated} images)")

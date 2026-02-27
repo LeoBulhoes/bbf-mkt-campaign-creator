@@ -235,7 +235,6 @@ from tools.image_gen import generate_batch
 records = get_pending_images()
 results = generate_batch(
     records,
-    reference_paths=["references/[brandname]/products/product_image.jpg"],
     model="nano-banana-pro",
     provider="google",
     num_variations=1,  # or 2 if user chose 2

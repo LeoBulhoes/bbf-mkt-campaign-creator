@@ -13,7 +13,6 @@ ENV_PATH = PROJECT_ROOT / "references" / ".env"
 load_dotenv(ENV_PATH)
 
 # --- API Keys ---
-KIE_API_KEY = os.getenv("KIE_API_KEY")
 AIRTABLE_API_KEY = os.getenv("AIRTABLE_API_KEY")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
@@ -23,32 +22,23 @@ GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
 WAVESPEED_API_KEY = os.getenv("WAVESPEED_API_KEY")
 WAVESPEED_API_URL = "https://api.wavespeed.ai/api/v3"
 
-# --- Kie AI Endpoints ---
-KIE_FILE_UPLOAD_URL = "https://kieai.redpandaai.co/api/file-stream-upload"
-KIE_CREATE_URL = "https://api.kie.ai/api/v1/jobs/createTask"
-KIE_STATUS_URL = "https://api.kie.ai/api/v1/jobs/recordInfo"
-
 # --- Airtable ---
 AIRTABLE_API_URL = "https://api.airtable.com/v0"
 AIRTABLE_TABLE_NAME = "Content"
 
-# --- Cost Constants (legacy — use get_cost() for multi-provider) ---
-IMAGE_COST = 0.09   # per Nano Banana Pro image (Kie AI)
-VIDEO_COST = 0.30   # per Kling/Sora video via Kie AI (approximate)
+# --- Cost Constants ---
+IMAGE_COST = 0.04   # per Nano Banana image
+VIDEO_COST = 0.50   # per Veo 3.1 video
 WAVESPEED_VIDEO_COST = 0.30  # per Kling/Sora video via WaveSpeed (approximate)
 
 # --- Per-model per-provider costs ---
 COSTS = {
     # Image models
     ("nano-banana", "google"): 0.04,
-    ("nano-banana", "kie"): 0.09,
     ("nano-banana-pro", "google"): 0.13,
-    ("nano-banana-pro", "kie"): 0.09,
-    ("gpt-image-1.5", "wavespeed"): 0.07,  # ~$0.04 medium / ~$0.08 high via OpenAI — verify at wavespeed.ai
+    ("gpt-image-1.5", "wavespeed"): 0.07,
     # Video models
     ("veo-3.1", "google"): 0.50,
-    ("kling-3.0", "kie"): 0.30,
-    ("sora-2-pro", "kie"): 0.30,
     ("kling-3.0", "wavespeed"): 0.30,
     ("sora-2", "wavespeed"): 0.30,
     ("sora-2-pro", "wavespeed"): 0.30,
@@ -61,13 +51,8 @@ DEFAULT_VIDEO_MODEL = "veo-3.1"
 # --- Directories ---
 INPUTS_DIR = PROJECT_ROOT / "references" / "inputs"
 
-# --- Video Models (Kie AI) ---
-# Both models support image-to-video (using image_urls for the start frame).
-# Kling 3.0: image/text-to-video, std/pro quality, 3-15s duration, multi-shot support
-# Sora 2 Pro: image-to-video, portrait/landscape, 10s/15s, high quality
+# --- Video Models ---
 VIDEO_MODELS = {
-    "kling-3.0": "kling-3.0/video",
-    "sora-2-pro": "sora-2-pro-image-to-video",
     "veo-3.1": "veo-3.1-generate-preview",
 }
 
@@ -114,8 +99,8 @@ def check_credentials():
     missing = [name for name, value in required.items() if not value]
 
     # At least one generation provider must be configured
-    if not KIE_API_KEY and not GOOGLE_API_KEY:
-        missing.append("KIE_API_KEY or GOOGLE_API_KEY (at least one required)")
+    if not GOOGLE_API_KEY:
+        missing.append("GOOGLE_API_KEY (required for image/video generation)")
 
     if missing:
         print("Missing API keys:")
