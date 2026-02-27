@@ -17,6 +17,9 @@ import requests
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from io import BytesIO
+from PIL import Image
+
 from .. import config
 from ..utils import print_status
 from ..gcp_upload import upload_reference
@@ -64,21 +67,66 @@ def _encode_image_base64(file_path):
     return data, mime_type
 
 
-def _upload_base64_to_host(base64_data, filename="generated.png", custom_name=None):
+def _upload_base64_to_host(base64_data, filename="generated.png", custom_name=None, apply_mask=False):
     """
     Decode base64 image data, save to temp file, upload to GCP hosting.
-    Returns the hosted URL for Airtable.
+    Also composites the Ad Mask if apply_mask is True and uploads the masked version.
+    Returns a dict with 'original' and optionally 'masked' URLs.
 
     Args:
         base64_data: Base64-encoded image data
         filename: Temp file name for local save
         custom_name: Optional GCS blob name (passed to upload_reference)
+        apply_mask: Whether to apply the Ad Mask overlay
     """
     tmp_path = os.path.join(tempfile.gettempdir(), filename)
+    image_data = base64.b64decode(base64_data)
     with open(tmp_path, "wb") as f:
-        f.write(base64.b64decode(base64_data))
+        f.write(image_data)
+        
+    urls = {}
     try:
-        return upload_reference(tmp_path, custom_name=custom_name)
+        urls["original"] = upload_reference(tmp_path, custom_name=custom_name)
+        
+        if apply_mask:
+            mask_path = os.path.join(config.PROJECT_ROOT, "references", "brands", "bluebullfly", "logo", "Ad Mask.png")
+            if os.path.exists(mask_path):
+                img = Image.open(BytesIO(image_data)).convert("RGBA")
+                mask = Image.open(mask_path).convert("RGBA")
+                
+                # Resize mask to fit width of image if needed, or just overlay
+                # The mask should be overlaid at the top-left
+                mask_w, mask_h = mask.size
+                img_w, img_h = img.size
+                
+                # Resize mask relatively if it's too big, or use it as is?
+                # Usually we can just composite it directly. Let's make sure it fits
+                if mask_w > img_w or mask_h > img_h:
+                    mask.thumbnail((img_w, img_h), Image.Resampling.LANCZOS)
+                
+                img.alpha_composite(mask, (0, 0))
+                
+                masked_filename = "masked_" + filename
+                masked_tmp_path = os.path.join(tempfile.gettempdir(), masked_filename)
+                
+                # Save as same format, dropping alpha if JPEG
+                out_format = "JPEG" if filename.lower().endswith(('.jpg', '.jpeg')) else "PNG"
+                if out_format == "JPEG":
+                    img = img.convert("RGB")
+                    
+                img.save(masked_tmp_path, format=out_format)
+                
+                masked_custom_name = None
+                if custom_name:
+                    path_parts = custom_name.rsplit('.', 1)
+                    masked_custom_name = f"{path_parts[0]}_masked.{path_parts[1]}" if len(path_parts) > 1 else f"{custom_name}_masked"
+                
+                urls["masked"] = upload_reference(masked_tmp_path, custom_name=masked_custom_name)
+                os.remove(masked_tmp_path)
+            else:
+                print_status(f"Warning: Ad Mask not found at {mask_path}", "!!")
+                
+        return urls
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
@@ -159,10 +207,16 @@ def submit_image(prompt, image_urls=None, aspect_ratio="9:16",
             if ad_filename:
                 custom_name = f"ads/{ad_filename}{ext}"
 
-            hosted_url = _upload_base64_to_host(b64_data, f"google_gen{ext}", custom_name=custom_name)
+            hosted_urls = _upload_base64_to_host(
+                b64_data, 
+                f"google_gen{ext}", 
+                custom_name=custom_name,
+                apply_mask=True  # Apply brand mask to all images
+            )
             return {
                 "status": "success",
-                "result_url": hosted_url,
+                "result_url": hosted_urls["original"],
+                "masked_url": hosted_urls.get("masked"),
                 "task_id": None,
             }
 
@@ -241,11 +295,16 @@ def submit_video(prompt, image_urls=None, model="veo-3.1",
         "instances": [instance],
         "parameters": {
             "aspectRatio": aspect_ratio,
-            "durationSeconds": dur,
+            "durationSeconds": int(duration),
             "sampleCount": 1,
             "personGeneration": "allow_adult" if has_image else "allow_all",
         },
     }
+
+    import json
+    print("\n--- VEO REQUEST PAYLOAD ---")
+    print(json.dumps(payload, indent=2))
+    print("---------------------------\n")
 
     url = _PREDICT_URL.format(model=google_model)
     response = requests.post(url, headers=_headers(), json=payload, timeout=120)
@@ -307,14 +366,15 @@ def poll_video(operation_name, max_wait=600, poll_interval=10, quiet=False):
                 raise Exception(f"No video URI in Veo response: {samples[0]}")
 
             # Download video (requires API key auth) and upload to GCS/Airtable
-            hosted_url = _download_and_host_video(video_uri)
+            hosted_urls = _download_and_host_video(video_uri, apply_mask=True)
 
             if not quiet:
                 print_status("Veo task completed successfully!", "OK")
 
             return {
                 "status": "success",
-                "result_url": hosted_url,
+                "result_url": hosted_urls["original"],
+                "masked_url": hosted_urls.get("masked"),
                 "task_id": operation_name,
             }
 
@@ -328,8 +388,15 @@ def poll_video(operation_name, max_wait=600, poll_interval=10, quiet=False):
     raise Exception(f"Veo timeout after {max_wait}s for operation: {operation_name}")
 
 
-def _download_and_host_video(video_uri):
-    """Download a Veo video (requires API key) and upload to GCP hosting."""
+def _download_and_host_video(video_uri, apply_mask=False):
+    """Download a Veo video, apply mask if requested (requires API key), and upload to GCP hosting."""
+    import subprocess
+    try:
+        import imageio_ffmpeg
+        has_ffmpeg = True
+    except ImportError:
+        has_ffmpeg = False
+        
     tmp_path = os.path.join(tempfile.gettempdir(), f"veo_video_{uuid.uuid4().hex[:8]}.mp4")
 
     response = requests.get(video_uri, headers=_headers(), stream=True, timeout=120)
@@ -339,8 +406,39 @@ def _download_and_host_video(video_uri):
         for chunk in response.iter_content(chunk_size=8192):
             f.write(chunk)
 
+    urls = {}
     try:
-        return upload_reference(tmp_path)
+        urls["original"] = upload_reference(tmp_path)
+        
+        if apply_mask:
+            mask_path = os.path.join(config.PROJECT_ROOT, "references", "brands", "bluebullfly", "logo", "Ad Mask.png")
+            if os.path.exists(mask_path) and has_ffmpeg:
+                ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+                masked_path = os.path.join(tempfile.gettempdir(), f"veo_masked_{uuid.uuid4().hex[:8]}.mp4")
+                
+                cmd = [
+                    ffmpeg_exe, "-y",
+                    "-i", tmp_path,
+                    "-i", mask_path,
+                    "-filter_complex", "[1:v][0:v]scale2ref[mask][main];[main][mask]overlay=0:0",
+                    "-c:a", "copy",
+                    masked_path
+                ]
+                
+                try:
+                    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    urls["masked"] = upload_reference(masked_path)
+                except Exception as e:
+                    print_status(f"Warning: Failed to mask video: {e}", "XX")
+                finally:
+                    if os.path.exists(masked_path):
+                        os.remove(masked_path)
+            elif not has_ffmpeg:
+                print_status("Warning: imageio_ffmpeg not installed; skipping video mask", "!!")
+            else:
+                print_status(f"Warning: Ad Mask not found at {mask_path}", "!!")
+                
+        return urls
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)

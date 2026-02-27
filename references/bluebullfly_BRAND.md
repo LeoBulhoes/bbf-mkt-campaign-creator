@@ -47,11 +47,6 @@ Bluebullfly creates trendy, high-quality kids and youth apparel — from everyda
 - Tone: Friendly, not childish
 
 ### Ad Style (from existing creative)
-- **Ad 1 (Playground)**: [ad_1_playground.png](./brands/bluebullfly/ads/ad_1_playground.png)
-- **Ad 2 (Flat Lay)**: [ad_2_flatlay.png](./brands/bluebullfly/ads/ad_2_flatlay.png)
-- **Ad 3 (Hoodie Lifestyle)**: [ad_3_hoodie.png](./brands/bluebullfly/ads/ad_3_hoodie.png)
-- **Site Backgrounds**: [site_bg_1.png](./brands/bluebullfly/ads/site_bg_1.png), [site_bg_2.png](./brands/bluebullfly/ads/site_bg_2.png)
-- **Thank You Card**: [thanks_order.png](./brands/bluebullfly/ads/thanks_order.png)
 - Lifestyle realistic photography with **real kids and people** in natural settings (playground, bedroom, school, living room, parties)
 - Info card overlay (rounded white rectangle) with tagline + bullet points
 - Butterfly emoji 🦋 used as bullet markers
@@ -59,6 +54,28 @@ Bluebullfly creates trendy, high-quality kids and youth apparel — from everyda
 - Clean, bright, **warm golden-hour lighting**
 
 
+## **🎨 Brand Masking & Composition (CRITICAL)**
+
+All content is overlaid with [Ad Mask.png](./brands/bluebullfly/ads/Ad Mask.png), which places the brand logo in the **Top-Left Corner**.
+* **The "Top-Left" Dead Zone:** Do NOT place focal points (faces, product logos, or hands) in the top-left quadrant of the frame.  
+* **The Framing Rule:** Every image/video prompt must force the subject to the center or right-third of the frame.
+
+
+### **3 Video Generation (Veo 3.1)**
+
+#### **The "Product-First" Video Formula**
+
+Starting from the \[ad\], the subject wearing \*\*this \[product\]\*\* \[Motion Description\]. \[Camera Movement\]. \[Atmosphere\]. \[Framing Guardrail\].
+
+* **Framing Guardrail:** "Maintain subject position in center-right; ensure no motion drifts into the top-left logo area."  
+* **Recommended Camera Movement:** \* **Slow push-in:** Focuses on the center/right.  
+  * **Orbit Right:** Reveals the product while moving away from the top-left zone.  
+  * **Handheld tracking:** Keep the subject centered or to the right.
+
+### **4 Implementation Logic**
+
+* **Post-Processing:** After generation, the Ad Mask.png must be layered over the image/video to create the final ad asset.  
+* **Review Step:** Verify in the review phase that no child's face or product detail is clipped by the top-left butterfly logo.
 
 
 
@@ -130,19 +147,6 @@ Navy, Purple, Maroon, Forest Green, Royal, Orange, Gold, Carolina Blue, Light Pi
 
 ## Existing Creative Assets
 
-### Video Assets (Local)
-- **Promo 1 (9:16)**: [video_1_9x16.mp4](./brands/bluebullfly/videos/video_1_9x16.mp4)
-- **Promo 1 (16:9)**: [video_1_16x9.mp4](./brands/bluebullfly/videos/video_1_16x9.mp4)
-- **Promo 2 (9:16)**: [video_2_9x16.mp4](./brands/bluebullfly/videos/video_2_9x16.mp4)
-- **Promo 2 (16:9)**: [video_2_16x9.mp4](./brands/bluebullfly/videos/video_2_16x9.mp4)
-
-### Local Assets (~/Leo/Bulhoes.org/Bluebullfly (local)/)
-- **Pictures/**: 3 finished ad images (Ad 1–3), logo files, embroidery designs, site backgrounds, screenshots
-- **Videos/**: 8 promo videos in 16:9 and 9:16 formats
-- **AI Model/**: Ollama Modelfile for BlueBullFly marketing persona (mistral-small3.2:24b)
-
-### Shopify CDN Product Images
-All product mockup images available via Shopify CDN — see `products/products_export.csv` for full URLs.
 
 ## Competitors / Inspiration
 

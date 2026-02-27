@@ -153,6 +153,7 @@ print('Reference URLs saved.')
 Design 1 unique post that:
 
 1. **Rotate through content pillars** — don't stack the same topic multiple days in a row
+2. **Apply Framing Guardrails** — The brand uses an Ad Mask with a logo in the top-left corner. Every image prompt must include: `"Maintain subject position in center-right; ensure no focal points (faces, product logos, hands) drift into the top-left logo area."`
 
 | Style | Prompt Formula Example |
 | :--- | :--- |
@@ -193,6 +194,8 @@ Use `create_records_batch` to create the records. Each record gets:
     "Image Prompt": "9:16. ...",
     "Image Model": "Nano Banana Pro",
     "Image Status": "Pending",
+    "Generated Image 1": [],
+    "Masked Image 1": [],
     "Caption": "...",
     "Scheduled Date": "2026-02-27T10:00:00-06:00",
 }
@@ -247,15 +250,15 @@ results = generate_batch(
 This will:
 1. Read all records with `Image Status = "Pending"` from Airtable
 2. Generate an image for each record using its `Image Prompt`
-3. Upload the generated image to GCP hosting
-4. Attach the image URL back to the Airtable record (`Generated Image 1`)
+3. Upload the generated image and its Masked version to GCP hosting
+4. Attach the image URLs back to the Airtable record (`Generated Image 1` and `Masked Image 1`)
 5. Update `Image Status` to `"Generated"`
 
 ### Step 3.3: Review Checkpoint
 
 After all images are generated, tell the user:
 
-"Image is generated and visible in Airtable! Check the 'Generated Image 1' column. Mark any you love as 'Approved' and anything you want redone as 'Rejected'. I can regenerate rejected ones with tweaked prompts."
+"Image is generated and visible in Airtable! Check the 'Masked Image 1' and 'Generated Image 1' columns. Mark any you love as 'Approved' and anything you want redone as 'Rejected'. I can regenerate rejected ones with tweaked prompts."
 
 **Do NOT proceed to video generation or scheduling until the user confirms.**
 **Ask user if he wants to generate video prompt.**
@@ -287,7 +290,6 @@ Before generating, show the cost:
 - Estimated time: ~3-5 minutes per video
 
 Ask: "This will generate [N] videos using Veo 3.1 at ~$0.50 each. Total cost: ~$[total]. Proceed?"
-
 **Do NOT proceed to video generation until the user approves, confirms or requests.**
 
 ### Step 3.5.3: Generate Videos
@@ -343,4 +345,3 @@ This will:
 11. **Video from image** — always generate and approve images BEFORE generating videos
 12. **Scheduling timezone** — use the user's timezone from the metadata timestamp offset
 13. **Airtable batch limits** — records are created in batches of 10 (handled automatically by `create_records_batch`)
-

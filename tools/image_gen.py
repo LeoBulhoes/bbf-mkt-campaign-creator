@@ -187,6 +187,8 @@ def generate_for_record(record, model=None, provider=None,
     }
     for var_num, result in enumerate(results, 1):
         update_fields[f"Generated Image {var_num}"] = [{"url": result["result_url"]}]
+        if result.get("masked_url"):
+            update_fields[f"Masked Image {var_num}"] = [{"url": result["masked_url"]}]
 
     update_record(record_id, update_fields)
     print_status(f"Airtable updated for '{ad_name}' ({num_variations} variation(s))", "OK")
@@ -384,6 +386,8 @@ def generate_batch(records, model=None, provider=None,
                 record_ok = False
             else:
                 update_fields[f"Generated Image {var_num}"] = [{"url": result["result_url"]}]
+                if result.get("masked_url"):
+                    update_fields[f"Masked Image {var_num}"] = [{"url": result["masked_url"]}]
                 images_generated += 1
                 actual_cost += config.get_cost(rec_model, rec_pname)
 

@@ -181,13 +181,15 @@ Use `create_records_batch` to create all 30 records. Each record gets:
 ```python
 {
     "Index": start_index + i,
-    "Ad Name": "Reaper - Day 1 - UGC Selfie",
-    "Product": "Reaper Bomber Jacket",
+    "Ad Name": "[image types] - Day 1 - UGC Selfie",
+    "Product": "[image types] Product",
     "Reference Images": [{"url": ref_url}],
-    "Image Prompt": "9:16. A young man in a dark bedroom mirror selfie...",
+    "Image Prompt": "9:16. ...",
     "Image Model": "Nano Banana Pro",
     "Image Status": "Pending",
-    "Caption": "Full tactical. Zero compromises 🖤\n\nReaper drops March 1st, 2026. fabricoftheuniverse.com\n\n#darkwear #techwearfit #fbrc",
+    "Generated Image 1": [],
+    "Masked Image 1": [],
+    "Caption": "...",
     "Scheduled Date": "2026-02-25T10:00:00+11:00",
 }
 ```
@@ -252,9 +254,10 @@ This will:
 
 After all images are generated, tell the user:
 
-"All 30 images are generated and visible in Airtable! Check the 'Generated Image 1' column. Mark any you love as 'Approved' and anything you want redone as 'Rejected'. I can regenerate rejected ones with tweaked prompts."
+"All 30 images are generated and visible in Airtable! Check the 'Masked Image 1' and 'Generated Image 1' column. Mark any you love as 'Approved' and anything you want redone as 'Rejected'. I can regenerate rejected ones with tweaked prompts."
 
 **Do NOT proceed to video generation or scheduling until the user confirms.**
+**Ask user if he wants to generate video prompt.**
 
 ---
 
@@ -283,6 +286,7 @@ Before generating, show the cost:
 - Estimated time: ~3-5 minutes per video
 
 Ask: "This will generate [N] videos using Veo 3.1 at ~$0.50 each. Total cost: ~$[total]. Proceed?"
+**Do NOT proceed to video generation until the user approves, confirms or requests.**
 
 ### Step 3.5.3: Generate Videos
 

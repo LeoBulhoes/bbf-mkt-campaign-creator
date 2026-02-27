@@ -68,7 +68,14 @@ For maximum accuracy, provide two visual inputs to the AI:
 2. **The [shop image]**: The original high-res product photo (serves as the detail reference).
 
 ### The "Product-First" Video Formula
-`Starting from the [ad], the subject wearing **this [product]** [Motion Description]. [Camera Movement]. [Atmosphere].`
+`Starting from the [ad], the subject wearing **this [product]** [Motion Description]. [Camera Movement]. [Atmosphere]. [Framing Guardrail].`
+
+* **Framing Guardrail:** "Maintain subject position in center-right; ensure no motion drifts into the top-left logo area."  
+* **Recommended Camera Movement:** \* **Slow push-in:** Focuses on the center\left to avoid social media buttons.  
+  * **Orbit Right:** Reveals the product while moving away from the top-left zone.  
+  * **Handheld tracking:** Keep the subject centered.
+
+
 
 * **Rule:** Only describe the **CHANGE**. Do not re-describe the static scene of the [ad]; only describe what moves.
 * **Rule:** Anchor to the product. Use "this [product]" to force the AI to map details from the shop image onto the video movement.
@@ -87,3 +94,5 @@ For maximum accuracy, provide two visual inputs to the AI:
 * **Environment Logic:** Ensure the background matches the item (e.g., no winter jackets on a beach).
 * **Text:** Nano Banana struggles with text; do not ask for words like "SALE" or "NEW" on the clothes.
 * **No-Go Zones:** Avoid messy rooms, political/religious symbols, or competing brand logos in backgrounds.
+* **Post-Processing:** After generation, the Ad Mask.png must be layered over the image/video to create the final ad asset.  
+* **Review Step:** Verify in the review phase that no child's face or product detail is clipped by the top-left butterfly logo.

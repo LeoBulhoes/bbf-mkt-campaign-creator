@@ -68,6 +68,8 @@ def create_ugc_table():
             },
             {"name": "Generated Image 1", "type": "multipleAttachments"},
             {"name": "Generated Image 2", "type": "multipleAttachments"},
+            {"name": "Masked Image 1", "type": "multipleAttachments"},
+            {"name": "Masked Image 2", "type": "multipleAttachments"},
             {"name": "Caption", "type": "multilineText"},
             {"name": "Scheduled Date", "type": "singleLineText"},
             {"name": "Video Prompt", "type": "multilineText"},
@@ -97,6 +99,8 @@ def create_ugc_table():
             },
             {"name": "Generated Video 1", "type": "multipleAttachments"},
             {"name": "Generated Video 2", "type": "multipleAttachments"},
+            {"name": "Masked Video 1", "type": "multipleAttachments"},
+            {"name": "Masked Video 2", "type": "multipleAttachments"},
         ],
     }
 
