@@ -1,0 +1,8 @@
+Flask
+gunicorn
+requests
+pyairtable
+google-cloud-storage
+google-cloud-secret-manager
+google-api-python-client
+google-auth

@@ -1,0 +1,6 @@
+Flask
+gunicorn
+requests
+facebook-business
+google-analytics-data
+google-cloud-bigquery

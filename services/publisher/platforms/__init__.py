@@ -1,0 +1,1 @@
+# Initialize platforms module
