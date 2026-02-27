@@ -1,1 +1,16 @@
+https://storage.googleapis.com/bluebullfly/references/activewear_tee_blue_front.jpg
+https://storage.googleapis.com/bluebullfly/references/mug_15oz_front.jpg
+https://storage.googleapis.com/bluebullfly/references/moisture_tee_navy_front.jpg
+https://storage.googleapis.com/bluebullfly/references/cap_red_front.jpg
+https://storage.googleapis.com/bluebullfly/references/cap_blue_front.jpg
 https://storage.googleapis.com/bluebullfly/references/kids_cotton_tee_back.jpg
+https://storage.googleapis.com/bluebullfly/references/hoodie_pink_front.jpg
+https://storage.googleapis.com/bluebullfly/references/sticker_3x3.jpg
+https://storage.googleapis.com/bluebullfly/references/hoodie_carolina_blue_front.jpg
+https://storage.googleapis.com/bluebullfly/references/hoodie_royal_front.jpg
+https://storage.googleapis.com/bluebullfly/references/activewear_tee_navy_front.jpg
+https://storage.googleapis.com/bluebullfly/references/dryblend_chest_navy_front.jpg
+https://storage.googleapis.com/bluebullfly/references/kids_cotton_tee_front.jpg
+https://storage.googleapis.com/bluebullfly/references/cap_pink_front.jpg
+https://storage.googleapis.com/bluebullfly/references/classic_tee_navy_front.jpg
+https://storage.googleapis.com/bluebullfly/references/dryblend_back_navy.jpg

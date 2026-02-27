@@ -14,7 +14,7 @@ Supported Features:
 import time
 from . import config
 from .utils import print_status
-from .gcp_upload import upload_references
+from .gcp_upload import upload_references, check_blob_exists
 from .airtable import update_record
 from .providers import get_image_provider, is_sync
 
@@ -258,6 +258,8 @@ def generate_batch(records, model=None, provider=None,
     num_variations = max(1, min(2, num_variations))
     var_range = range(1, num_variations + 1)
     images_total = count * num_variations
+    
+    images_total = count * num_variations
     total_cost = 0.0
 
     print(f"\n{'=' * 50}")
@@ -303,6 +305,30 @@ def generate_batch(records, model=None, provider=None,
 
         # Derive ad filename from reference attachments
         ad_filename = _ad_filename_from_attachments(ref_attachments)
+
+        # --- Asset Reuse Check (Per-Iteration) ---
+        # If num_variations is 1, check GCS immediately before generating to see if this product was 
+        # already handled earlier in this batch or in a previous run.
+        reused_url = None
+        if num_variations == 1 and ad_filename:
+            for ext in [".jpg", ".png"]:
+                blob_path = f"ads/{ad_filename}{ext}"
+                reused_url = check_blob_exists(blob_path)
+                if reused_url:
+                    break
+        
+        if reused_url:
+            print_status(f"Reusing existing GCS asset for: {ad_name}", "OK")
+            dummy_result = {"status": "success", "result_url": reused_url, "reused": True}
+            # Check for masked version
+            ext = reused_url.rsplit(".", 1)[-1]
+            masked_blob = f"ads/{ad_filename}_masked.{ext}"
+            masked_url = check_blob_exists(masked_blob)
+            if masked_url:
+                dummy_result["masked_url"] = masked_url
+            
+            submissions.append((record, 1, dummy_result, rec_model, rec_pmod, rec_pname, True))
+            continue
 
         for var_num in var_range:
             print_status(f"Generating: {ad_name} (variation {var_num}) [{display_model} via {rec_pname}]")

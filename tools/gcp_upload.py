@@ -85,3 +85,29 @@ def upload_references(file_paths, bucket_name=None):
         url = upload_reference(path, bucket_name, custom_name=f"references/{filename}")
         urls.append(url)
     return urls
+def check_blob_exists(blob_name, bucket_name=None):
+    """
+    Check if a blob exists in the GCS bucket.
+    
+    Args:
+        blob_name: Name of the blob/file in GCS (e.g., 'ads/product_ad.jpg')
+        bucket_name: Optional bucket name override
+        
+    Returns:
+        str: The public URL if it exists, None otherwise.
+    """
+    bucket_name = bucket_name or config.GCP_BUCKET_NAME
+    if not bucket_name:
+        return None
+        
+    try:
+        client = get_storage_client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        
+        if blob.exists():
+            return blob.public_url
+        return None
+    except Exception as e:
+        print_status(f"Error checking GCS blob existence: {e}", "!!")
+        return None

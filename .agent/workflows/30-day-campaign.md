@@ -121,7 +121,7 @@ Write the file to `references/[brandname]_BRAND.md` with this structure:
 
 ## Phase 2: Create the 30-Day Content Calendar in Airtable
 
-**Goal:** Create 30 records in Airtable — each with a unique Image Prompt, Caption, and Scheduled Date. The user reviews everything in Airtable BEFORE any images are generated.
+**Goal:** Create a 30-day content calendar with a mix of **1 to 4 distinct products per day**. Each product for a given day should have its own record in Airtable (individual ad) with a unique Image Prompt, Caption, and Scheduled Date. The user reviews everything in Airtable BEFORE any images are generated.
 
 ### Step 2.1: Read the Brand File
 
@@ -146,9 +146,9 @@ print('Reference URLs saved.')
 
 ### Step 2.3: Plan the 30 Posts
 
-Design 30 unique posts that:
+Design 30 unique posts that **utilize the entire product catalog** (rotate through all available reference images in the `products/` folder) and:
 
-1. **Rotate through content pillars** — don't stack the same topic multiple days in a row
+1. **Rotate through specific Styles** — follow this distribution exactly and dont use the examples to filter products or categories:
 
 | Style | Distribution | Prompt Formula Example |
 | :--- | :--- | :--- |
@@ -159,14 +159,14 @@ Design 30 unique posts that:
 | **Cozy Spaces** | ~3 Posts | `A student relaxing in a cozy library nook wearing this t-shirt. Calm confidence.` |
 | **School Flat Lay** | ~2 Posts | `Overhead shot of this cap and this sticker on a wooden school desk with notebooks.` |
 
-2. **Follow a weekly rhythm** (example):
-   - **Monday:** Motivational / Brand statement
-   - **Tuesday:** Product detail close-up
-   - **Wednesday:** UGC selfie-style
-   - **Thursday:** Studio hero shot
-   - **Friday:** Urban lifestyle
-   - **Saturday:** World-building / CGI
-   - **Sunday:** Community engagement
+2. **Follow the Weekly Rhythm strictly** (mapping these styles to days):
+   - **Monday:** Motivational / Brand statement (Style: Nature/Outdoor)
+   - **Tuesday:** Product detail close-up (Style: Quality Detail)
+   - **Wednesday:** UGC selfie-style (Style: Candid Play)
+   - **Thursday:** Studio hero shot (Style: Sports Hero or Quality Detail)
+   - **Friday:** Urban lifestyle (Style: Nature/Outdoor)
+   - **Saturday:** World-building / CGI (Style: Nature/Outdoor)
+   - **Sunday:** Community engagement (Style: Cozy Spaces or Candid Play)
 
 3. **Write brand-voice captions** following the brand file's caption guidelines:
    - Include relevant emojis (from brand guide)
@@ -176,7 +176,7 @@ Design 30 unique posts that:
 
 ### Step 2.4: Create 30 Airtable Records
 
-Use `create_records_batch` to create all 30 records. Each record gets:
+Use `create_records_batch` to create all records (averaging 1-4 per day). Each record gets:
 
 ```python
 {
@@ -205,24 +205,24 @@ Show:
 - 3-5 sample captions with their prompts
 - The date range (start → end)
 
-Ask: "I've created all 30 records in Airtable with prompts, captions, and scheduled dates. Head over to Airtable to review them — you can edit any captions or prompts before I generate the images. Let me know when you're happy with everything!"
+Ask: "I've created all 30 dates in Airtable with prompts, captions, and scheduled dates. Head over to Airtable to review them — you can edit any captions or prompts before I generate the images. Let me know when you're happy with everything!"
 
 **Do NOT proceed to image generation until the user approves.**
 
 ---
 
-## Phase 3: Generate All 30 Images
+## Phase 3: Generate All pending Images
 
-**Goal:** Generate unique images for each of the 30 Airtable records using Nano Banana Pro via Google AI Studio.
+**Goal:** Generate unique images for each of the pending Airtable records using Nano Banana Pro via Google AI Studio.
 
 ### Step 3.1: Cost Estimate
 
 Before generating, show the cost:
-- **30 images × $0.13 each = ~$3.90 total** (Nano Banana Pro via Google)
-- **2 variations per record = 60 images total = ~$7.80** (if doing 2 variations)
-- Estimated time: ~60-90 minutes for all 30 records
+- **[count of images] Pending images × $0.13 each = ~$3.90 total** (Nano Banana Pro via Google)
+- **2 variations per record = 1 images total = ~$7.80** (if doing 2 variations)
+- Estimated time: ~60-90 minutes for all [count of images] records
 
-Ask: "This will generate 30 images using Nano Banana Pro (Google AI Studio) at ~$0.13 each. Total cost: ~$3.90 for 1 variation per record, or ~$7.80 for 2 variations. Which would you prefer?"
+Ask: "This will generate [count of images] images using Nano Banana Pro (Google AI Studio) at ~$0.13 each. Total cost: ~$3.90 for 1 variation per record, or ~$7.80 for 2 variations. Which would you prefer?"
 
 ### Step 3.2: Generate Images
 
@@ -254,7 +254,7 @@ This will:
 
 After all images are generated, tell the user:
 
-"All 30 images are generated and visible in Airtable! Check the 'Masked Image 1' and 'Generated Image 1' column. Mark any you love as 'Approved' and anything you want redone as 'Rejected'. I can regenerate rejected ones with tweaked prompts."
+"All [count of images] images are generated and visible in Airtable! Check the 'Masked Image 1' and 'Generated Image 1' column. Mark any you love as 'Approved' and anything you want redone as 'Rejected'. I can regenerate rejected ones with tweaked prompts."
 
 **Do NOT proceed to video generation or scheduling until the user confirms.**
 **Ask user if he wants to generate video prompt.**
@@ -263,7 +263,7 @@ After all images are generated, tell the user:
 
 ## Phase 3.5: Generate Videos (Optional)
 
-**Goal:** Convert select approved images into short-form videos using Veo 3.1 (Google AI Studio). Not all 30 posts need video — typically 8-12 is ideal for a mix of static and video content.
+**Goal:** Convert select approved images into short-form videos using Veo 3.1 (Google AI Studio). Not all  posts need video — typically 8-12 is ideal for a mix of static and video content.
 
 ### Step 3.5.1: Select Records for Video
 

@@ -216,7 +216,7 @@ Proceed? (yes/no)
 ## Important Rules
 
 ### NEVER Create Throwaway Scripts
-**Do NOT create new Python files for one-off tasks.** The existing tools handle everything. Run inline Python commands using existing modules:
+**Rule:Do NOT create new Python files for one-off tasks.** The existing tools handle everything. Run inline Python commands using existing modules:
 
 ```python
 python -c "import sys; sys.path.insert(0, '.'); from dotenv import load_dotenv; load_dotenv('references/.env'); from tools.airtable import get_next_index; print(get_next_index())"
