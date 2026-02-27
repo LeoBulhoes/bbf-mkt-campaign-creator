@@ -190,8 +190,6 @@ def submit_video(prompt, image_urls=None, model="veo-3.1",
 
     # Build instance
     instance = {"prompt": prompt}
-    payload_images = {}
-    anchors = []
 
     # Handle image list
     # Veo 3.1 image format: use bytesBase64Encoded (NOT inlineData) for REST API.
@@ -220,6 +218,7 @@ def submit_video(prompt, image_urls=None, model="veo-3.1",
     dur = min(valid_durations, key=lambda v: abs(v - dur))
 
     # image-to-video requires personGeneration=allow_adult and duration=8s
+    # text-to-video uses allow_all so generated videos can include children in output
     has_image = "image" in instance
     if has_image:
         dur = 8
@@ -230,11 +229,9 @@ def submit_video(prompt, image_urls=None, model="veo-3.1",
             "aspectRatio": aspect_ratio,
             "durationSeconds": dur,
             "sampleCount": 1,
+            "personGeneration": "allow_adult" if has_image else "allow_all",
         },
     }
-
-    if has_image:
-        payload["parameters"]["personGeneration"] = "allow_adult"
 
     url = _PREDICT_URL.format(model=google_model)
     response = requests.post(url, headers=_headers(), json=payload, timeout=120)
