@@ -30,13 +30,16 @@
 * `16:9.` — Landscape (Website banners)
 
 ### Step 2: High-Volume Scene Templates
-| Style | Prompt Formula |
-| :--- | :--- |
-| **UGC/Selfie** | `A mirror selfie wearing this hoodie, clean bedroom background, authentic social media vibe.` |
-| **Active Lifestyle**| `A child playing tag on a sunny playground wearing this t-shirt. Candid action shot.` |
-| **Studio Hero** | `Professional model standing against a grey concrete wall wearing this hoodie. High-fashion pose.` |
-| **Urban/Street** | `A teenager walking through a colorful city street wearing this t-shirt. Street photography.` |
+**Rotate through content pillars** — don't stack the same topic multiple days in a row
 
+| Style | Prompt Formula Example |
+| :--- | :--- |
+| **Candid Play (UGC)** | `A child laughing on a bright playground wearing this t-shirt, authentic social media vibe.` |
+| **Sports Hero** | `A teenager in a power stance on a grass soccer field wearing this hoodie. Focused energy.` |
+| **Quality Detail** | `Extreme close-up detail shot of this t-shirt focusing on fabric and stitching, shallow depth of field.` |
+| **Nature/Outdoor** | `A person walking through a sun-drenched forest trail wearing this hoodie. Golden hour.` |
+| **Cozy Spaces** | `A student relaxing in a cozy library nook wearing this t-shirt. Calm confidence.` |
+| **School Flat Lay** | `Overhead shot of this cap and this sticker on a wooden school desk with notebooks.` |
 ---
 
 ## 2. Audience & Brand Guardrails (North America)

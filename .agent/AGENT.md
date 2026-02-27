@@ -249,11 +249,11 @@ Every caption must:
 ### Image Variety
 
 Rotate through these styles to keep the feed dynamic:
-- 🤳 **UGC / Selfie** — person filming themselves, phone-in-hand, natural lighting
-- 📸 **Studio Hero Shot** — model on grey/concrete backdrop, moody lighting
-- 🔍 **Close-up Detail** — extreme close-up on fabric, stitching, hardware
-- 🌆 **Urban Lifestyle** — walking through city streets, rooftops, parking garages
-- 🎨 **CGI/World-Building** — futuristic rendered scenes matching brand aesthetic
+- 🤳 **UGC / Selfie** — person filming themselves, phone-in-hand, natural lighting, playful and happy
+- 📸 **Studio Hero Shot** — model on funy studio setting, and happy
+<!-- - 🔍 **Close-up Detail** — extreme close-up on fabric, stitching, hardware -->
+- 🌆 **Urban Lifestyle** — walking through city streets, playing on playground, playing with kids, having adventures, happy
+<!-- - 🎨 **CGI/World-Building** — futuristic rendered scenes matching brand aesthetic -->
 - 📦 **Flat Lay / Product** — product laid out with accessories on textured surface
 
 ### Scheduling

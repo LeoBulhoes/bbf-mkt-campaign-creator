@@ -62,7 +62,7 @@ Bluebullfly creates trendy, high-quality kids and youth apparel — from everyda
 
 ## Product Catalog
 
-### Hero Products (best for first ads)
+<!-- ### Hero Products (best for first ads)
 | Product | Local Reference Image | Price | Best For |
 |---------|-----------------------|-------|----------|
 | Kids Cotton Crew Neck Performance T-Shirt | [front](./brands/bluebullfly/products/kids_cotton_tee_front.jpg), [back](./brands/bluebullfly/products/kids_cotton_tee_back.jpg) | $38.94 | All-over print, hero product |
@@ -70,7 +70,7 @@ Bluebullfly creates trendy, high-quality kids and youth apparel — from everyda
 | Youth Unisex Activewear Performance T-Shirt | [navy](./brands/bluebullfly/products/activewear_tee_navy_front.jpg), [blue](./brands/bluebullfly/products/activewear_tee_blue_front.jpg) | $15.28 | Affordable entry point |
 | Youth Unisex Modern Classic Fit T-Shirt | [navy](./brands/bluebullfly/products/classic_tee_navy_front.jpg) | $15.28 | Everyday wear |
 | Youth Unisex Moisture-Wicking T-Shirt | [navy](./brands/bluebullfly/products/moisture_tee_navy_front.jpg) | $20.50 | Sports/active lifestyle |
-| Youth Baseball Cap | [red](./brands/bluebullfly/products/cap_red_front.jpg), [blue](./brands/bluebullfly/products/cap_blue_front.jpg), [pink](./brands/bluebullfly/products/cap_pink_front.jpg) | $27.63 | Accessories, impulse buy |
+| Youth Baseball Cap | [red](./brands/bluebullfly/products/cap_red_front.jpg), [blue](./brands/bluebullfly/products/cap_blue_front.jpg), [pink](./brands/bluebullfly/products/cap_pink_front.jpg) | $27.63 | Accessories, impulse buy | -->
 
 ### Supporting Products
 | Product | Price | Best For |

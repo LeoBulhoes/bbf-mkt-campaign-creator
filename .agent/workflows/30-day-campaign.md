@@ -149,15 +149,17 @@ print('Reference URLs saved.')
 Design 30 unique posts that:
 
 1. **Rotate through content pillars** — don't stack the same topic multiple days in a row
-2. **Mix image types** across the 30 days:
-   - 🤳 **UGC / Selfie** (~8 posts) — person filming themselves, phone-in-hand, natural lighting
-   - 📸 **Studio Hero Shot** (~7 posts) — model on grey/concrete backdrop, moody lighting, power stance
-   - 🔍 **Close-up Detail** (~5 posts) — extreme close-up on fabric, stitching, hardware, graphics
-   - 🌆 **Urban Lifestyle** (~5 posts) — walking through gritty city streets, rooftops, parking garages
-   - 🎨 **CGI/World-Building** (~3 posts) — futuristic rendered scenes matching brand aesthetic
-   - 📦 **Flat Lay / Product** (~2 posts) — product laid out with accessories on textured surface
 
-3. **Follow a weekly rhythm** (example):
+| Style | Distribution | Prompt Formula Example |
+| :--- | :--- | :--- |
+| **Candid Play (UGC)** | ~8 Posts | `A child laughing on a bright playground wearing this t-shirt, authentic social media vibe.` |
+| **Sports Hero** | ~7 Posts | `A teenager in a power stance on a grass soccer field wearing this hoodie. Focused energy.` |
+| **Quality Detail** | ~5 Posts | `Extreme close-up detail shot of this t-shirt focusing on fabric and stitching, shallow depth of field.` |
+| **Nature/Outdoor** | ~5 Posts | `A person walking through a sun-drenched forest trail wearing this hoodie. Golden hour.` |
+| **Cozy Spaces** | ~3 Posts | `A student relaxing in a cozy library nook wearing this t-shirt. Calm confidence.` |
+| **School Flat Lay** | ~2 Posts | `Overhead shot of this cap and this sticker on a wooden school desk with notebooks.` |
+
+2. **Follow a weekly rhythm** (example):
    - **Monday:** Motivational / Brand statement
    - **Tuesday:** Product detail close-up
    - **Wednesday:** UGC selfie-style
@@ -166,7 +168,7 @@ Design 30 unique posts that:
    - **Saturday:** World-building / CGI
    - **Sunday:** Community engagement
 
-4. **Write brand-voice captions** following the brand file's caption guidelines:
+3. **Write brand-voice captions** following the brand file's caption guidelines:
    - Include relevant emojis (from brand guide)
    - Include 2-3 hashtags (from brand guide)
    - Include a CTA (call-to-action)
@@ -317,119 +319,6 @@ This will:
 
 ---
 
-## Phase 4: Schedule via Blotato (OR Manual Mode)
-
-**Goal:** Take the approved images/videos and their matching captions from Airtable, and schedule one post per day via Blotato.
-
-### Manual Mode (If no Blotato API Key)
-If `BLOTATO_API_KEY` is missing or placeholder:
-1.  **Read Approved Records**: Get the `Caption`, `Generated Image 1`, and `Generated Video 1` URLs from Airtable.
-2.  **Present Content**: Show the user a list of their posts:
-    - Thumbnail/Link to the media (hosted on GCP)
-    - Full caption text
-    - Recommended date/time for posting
-3.  **Completion**: Tell the user: "Since Blotato is not connected, I've prepared all your assets. Simply download the files and copy-paste the captions to your social media accounts at the scheduled times."
-4.  **STOP here.**
-
-### Scheduling Mode (If Blotato API Key exists)
-### Step 4.1: Confirm Schedule Settings
-
-Ask the user:
-1. **Platform** — Which connected account to post to?
-2. **Post time** — Confirm the daily post time (default from Scheduled Date field)
-
-Show connected accounts from `mcp_blotato_blotato_list_accounts`.
-
-### Step 4.2: Read Approved Records from Airtable
-
-```python
-from tools.airtable import get_records
-# Get all records that have generated images (or approved)
-records = get_records("{Image Status} = 'Generated'")
-# or if user approved them:
-records = get_records("{Image Status} = 'Approved'")
-```
-
-For each record, extract:
-- `Caption` — the post text
-- `Generated Image 1` — the image URL
-- `Scheduled Date` — the ISO 8601 timestamp
-
-### Step 4.3: Upload Images & Schedule Posts
-
-For each record:
-
-1. **Determine media type:** Check if `Generated Video 1` exists (video post) or only `Generated Image 1` (image post)
-2. **Get the media URL** from the appropriate Airtable attachment field
-3. **Schedule the post** via Blotato:
-
-**Image post:**
-```
-mcp_blotato_blotato_create_post(
-    accountId: "...",
-    platform: "instagram",
-    text: record["Caption"],
-    mediaUrls: [image_url],
-    scheduledTime: record["Scheduled Date"]
-)
-```
-
-**Video post (Instagram Reel):**
-```
-mcp_blotato_blotato_create_post(
-    accountId: "...",
-    platform: "instagram",
-    mediaType: "reel",
-    text: record["Caption"],
-    mediaUrls: [video_url],
-    scheduledTime: record["Scheduled Date"]
-)
-```
-
-**Video post (TikTok):**
-```
-mcp_blotato_blotato_create_post(
-    accountId: "...",
-    platform: "tiktok",
-    text: record["Caption"],
-    mediaUrls: [video_url],
-    scheduledTime: record["Scheduled Date"],
-    privacyLevel: "PUBLIC_TO_EVERYONE",
-    disabledComments: false,
-    disabledDuet: false,
-    disabledStitch: false,
-    isBrandedContent: false,
-    isYourBrand: false,
-    isAiGenerated: true
-)
-```
-
-4. **Track the submission ID** and confirm scheduling status
-
-### Step 4.4: Track & Log Scheduling Status
-
-For each scheduled post, record the result. Save to `references/outputs/schedule_log.md`:
-
-```markdown
-| Day | Date | Platform | Post Submission ID | Status |
-|-----|------|----------|-------------------|--------|
-| 1   | Feb 25 | instagram | sub_xxx | ✅ Scheduled |
-| 2   | Feb 26 | instagram | sub_yyy | ✅ Scheduled |
-| ... | ...  | ...      | ...               | ...    |
-```
-
-Present the final summary:
-- ✅ Total posts scheduled: 30
-- 📅 Date range: [Start] → [End]
-- 🕐 Post time: [Time] daily
-- 📱 Platform(s): Instagram, TikTok, etc.
-- 🖼️ Image posts: X
-- 🎬 Video posts: X
-- 💰 Total generation cost: $X.XX
-
-"Your 30-day campaign is now running on autopilot! 🚀"
-
----
 
 ## Key Rules
 
