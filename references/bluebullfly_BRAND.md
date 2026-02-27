@@ -30,9 +30,7 @@ Bluebullfly creates trendy, high-quality kids and youth apparel — from everyda
 - **Text Only**: [logo_text.png](./brands/bluebullfly/logo/logo_text.png)
 - **Combined**: [logo_with_text.png](./brands/bluebullfly/logo/logo_with_text.png)
 - **Embroidery Style**: [logo_embroidery.png](./brands/bluebullfly/logo/logo_embroidery.png)
-- Cartoon blue butterfly with a **yellow smiley face** — four wings in alternating light blue and royal blue, with curly antennae
-- The character has big cute eyes and a warm smile — child-friendly, approachable
-- Text logo available in matching blue font
+
 
 ### Color Palette
 | Role | Color | Hex (approx) |
@@ -54,11 +52,15 @@ Bluebullfly creates trendy, high-quality kids and youth apparel — from everyda
 - **Ad 3 (Hoodie Lifestyle)**: [ad_3_hoodie.png](./brands/bluebullfly/ads/ad_3_hoodie.png)
 - **Site Backgrounds**: [site_bg_1.png](./brands/bluebullfly/ads/site_bg_1.png), [site_bg_2.png](./brands/bluebullfly/ads/site_bg_2.png)
 - **Thank You Card**: [thanks_order.png](./brands/bluebullfly/ads/thanks_order.png)
-- Lifestyle photography with **real kids** in natural settings (playground, bedroom, school)
+- Lifestyle realistic photography with **real kids and people** in natural settings (playground, bedroom, school, living room, parties)
 - Info card overlay (rounded white rectangle) with tagline + bullet points
 - Butterfly emoji 🦋 used as bullet markers
 - Logo watermark in bottom-left
 - Clean, bright, **warm golden-hour lighting**
+
+
+
+
 
 ## Product Catalog
 

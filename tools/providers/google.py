@@ -64,16 +64,21 @@ def _encode_image_base64(file_path):
     return data, mime_type
 
 
-def _upload_base64_to_host(base64_data, filename="generated.png"):
+def _upload_base64_to_host(base64_data, filename="generated.png", custom_name=None):
     """
     Decode base64 image data, save to temp file, upload to GCP hosting.
     Returns the hosted URL for Airtable.
+
+    Args:
+        base64_data: Base64-encoded image data
+        filename: Temp file name for local save
+        custom_name: Optional GCS blob name (passed to upload_reference)
     """
     tmp_path = os.path.join(tempfile.gettempdir(), filename)
     with open(tmp_path, "wb") as f:
         f.write(base64.b64decode(base64_data))
     try:
-        return upload_reference(tmp_path)
+        return upload_reference(tmp_path, custom_name=custom_name)
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
@@ -140,12 +145,21 @@ def submit_image(prompt, image_urls=None, aspect_ratio="9:16",
         raise Exception(f"No candidates in Google AI response: {result}")
 
     resp_parts = candidates[0].get("content", {}).get("parts", [])
+    # Build GCS destination name from ad_filename if provided
+    ad_filename = kwargs.get("ad_filename")
+
     for part in resp_parts:
         if "inlineData" in part:
             b64_data = part["inlineData"]["data"]
             mime = part["inlineData"].get("mimeType", "image/png")
             ext = ".png" if "png" in mime else ".jpg"
-            hosted_url = _upload_base64_to_host(b64_data, f"google_gen{ext}")
+
+            # Use product-variant-based name when available
+            custom_name = None
+            if ad_filename:
+                custom_name = f"ads/{ad_filename}{ext}"
+
+            hosted_url = _upload_base64_to_host(b64_data, f"google_gen{ext}", custom_name=custom_name)
             return {
                 "status": "success",
                 "result_url": hosted_url,

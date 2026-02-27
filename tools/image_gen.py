@@ -19,6 +19,20 @@ from .airtable import update_record
 from .providers import get_image_provider, is_sync
 
 
+def _ad_filename_from_attachments(attachments):
+    """
+    Derive the ad filename stem from the first reference image attachment.
+    E.g. 'mug_15oz_front.jpg' → 'mug_15oz_front_ad'
+    Returns None if no filename is found.
+    """
+    for att in (attachments or []):
+        fname = att.get("filename", "")
+        if fname:
+            stem = fname.rsplit(".", 1)[0]  # strip extension
+            return f"{stem}_ad"
+    return None
+
+
 VALID_RATIOS = ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"]
 
 _MODEL_DISPLAY_NAMES = {
@@ -125,14 +139,20 @@ def generate_for_record(record, model=None, provider=None,
          print_status(f"Using {len(image_urls)} image anchor(s) from Airtable")
     print_status(f"Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
 
+    # Derive ad filename from reference image
+    ad_filename = _ad_filename_from_attachments(ref_attachments)
+
     results = []
     if sync:
         # Google: each call returns result directly
         for var_num in var_range:
             print_status(f"Generating variation {var_num}/{num_variations}...")
+            # Append variation number to ad_filename when multiple variations
+            var_name = f"{ad_filename}_v{var_num}" if ad_filename and num_variations > 1 else ad_filename
             result = provider_module.submit_image(
                 prompt, image_urls=image_urls,
-                aspect_ratio=effective_ratio, resolution=resolution, model=model
+                aspect_ratio=effective_ratio, resolution=resolution, model=model,
+                ad_filename=var_name
             )
             results.append(result)
             print_status(f"Done -> {result['result_url'][:50]}...", "OK")
@@ -279,20 +299,27 @@ def generate_batch(records, model=None, provider=None,
         ref_attachments = fields.get("Reference Images", [])
         image_urls = [at.get("url") for at in ref_attachments if at.get("url")]
 
+        # Derive ad filename from reference attachments
+        ad_filename = _ad_filename_from_attachments(ref_attachments)
+
         for var_num in var_range:
             print_status(f"Generating: {ad_name} (variation {var_num}) [{display_model} via {rec_pname}]")
+            # Append variation number when multiple variations
+            var_name = f"{ad_filename}_v{var_num}" if ad_filename and num_variations > 1 else ad_filename
             try:
                 if rec_sync:
                     result = rec_pmod.submit_image(
                         prompt, image_urls=image_urls,
-                        aspect_ratio=effective_ratio, resolution=resolution, model=rec_model
+                        aspect_ratio=effective_ratio, resolution=resolution, model=rec_model,
+                        ad_filename=var_name
                     )
                     submissions.append((record, var_num, result, rec_model, rec_pmod, rec_pname, True))
                     print_status(f"Done -> {result['result_url'][:50]}...", "OK")
                 else:
                     task_id = rec_pmod.submit_image(
                         prompt, image_urls=image_urls,
-                        aspect_ratio=effective_ratio, resolution=resolution, model=rec_model
+                        aspect_ratio=effective_ratio, resolution=resolution, model=rec_model,
+                        ad_filename=var_name
                     )
                     submissions.append((record, var_num, task_id, rec_model, rec_pmod, rec_pname, False))
                     print_status(f"Task {task_id}", "OK")

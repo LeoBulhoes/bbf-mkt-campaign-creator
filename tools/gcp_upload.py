@@ -77,9 +77,11 @@ def upload_reference(file_path, bucket_name=None, custom_name=None):
 def upload_references(file_paths, bucket_name=None):
     """
     Upload multiple reference files and return their hosted URLs.
+    Uses the original filename as the GCS blob name (e.g., references/mug_15oz_front.jpg).
     """
     urls = []
     for path in file_paths:
-        url = upload_reference(path, bucket_name)
+        filename = Path(path).name
+        url = upload_reference(path, bucket_name, custom_name=f"references/{filename}")
         urls.append(url)
     return urls

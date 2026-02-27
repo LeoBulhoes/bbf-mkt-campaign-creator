@@ -258,6 +258,7 @@ After all images are generated, tell the user:
 "Image is generated and visible in Airtable! Check the 'Generated Image 1' column. Mark any you love as 'Approved' and anything you want redone as 'Rejected'. I can regenerate rejected ones with tweaked prompts."
 
 **Do NOT proceed to video generation or scheduling until the user confirms.**
+**Ask user if he wants to generate video prompt.**
 
 ---
 
@@ -286,6 +287,8 @@ Before generating, show the cost:
 - Estimated time: ~3-5 minutes per video
 
 Ask: "This will generate [N] videos using Veo 3.1 at ~$0.50 each. Total cost: ~$[total]. Proceed?"
+
+**Do NOT proceed to video generation until the user approves, confirms or requests.**
 
 ### Step 3.5.3: Generate Videos
 
