@@ -12,14 +12,15 @@ env:
   GCP_DEPLOY_SERVICE_NAME: ai-cmo-agent
   GCP_REGION: us-central1
 
-permissions:
-  contents: 'read'
-  id-token: 'write'
+
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: prod
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
