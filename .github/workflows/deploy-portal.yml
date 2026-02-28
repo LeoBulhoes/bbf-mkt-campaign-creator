@@ -49,9 +49,26 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           IMAGE_URL="gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_DEPLOY_SERVICE_NAME }}"
+          ENV_VARS="^@^GCP_BUCKET_NAME=${{ vars.GCP_BUCKET_NAME }}"
+          ENV_VARS="${ENV_VARS}@TIKTOK_CLIENT_KEY=${{ secrets.TIKTOK_CLIENT_KEY }}"
+          ENV_VARS="${ENV_VARS}@TIKTOK_CLIENT_SECRET=${{ secrets.TIKTOK_CLIENT_SECRET }}"
+          ENV_VARS="${ENV_VARS}@TIKTOK_REDIRECT_URI=${{ vars.TIKTOK_REDIRECT_URI }}"
+          ENV_VARS="${ENV_VARS}@TIKTOK_ACCOUNT_ID=${{ vars.TIKTOK_ACCOUNT_ID }}"
+          ENV_VARS="${ENV_VARS}@META_ACCESS_TOKEN=${{ secrets.META_ACCESS_TOKEN }}"
+          ENV_VARS="${ENV_VARS}@META_APP_SECRET=${{ secrets.META_APP_SECRET }}"
+          ENV_VARS="${ENV_VARS}@META_APP_ID=${{ vars.META_APP_ID }}"
+          ENV_VARS="${ENV_VARS}@META_AD_ACCOUNT_ID=${{ vars.META_AD_ACCOUNT_ID }}"
+          ENV_VARS="${ENV_VARS}@INSTAGRAM_ACCOUNT_ID=${{ vars.INSTAGRAM_ACCOUNT_ID }}"
+          ENV_VARS="${ENV_VARS}@FB_PAGE_ID=${{ vars.FB_PAGE_ID }}"
+          ENV_VARS="${ENV_VARS}@AIRTABLE_API_KEY=${{ secrets.AIRTABLE_API_KEY }}"
+          ENV_VARS="${ENV_VARS}@AIRTABLE_BASE_ID=${{ vars.AIRTABLE_BASE_ID }}"
+          ENV_VARS="${ENV_VARS}@AIRTABLE_TABLE_NAME=${{ vars.AIRTABLE_TABLE_NAME }}"
+          ENV_VARS="${ENV_VARS}@GOOGLE_AISTUDIO_API_KEY=${{ secrets.GOOGLE_AISTUDIO_API_KEY }}"
+          
           gcloud run deploy ${{ env.GCP_DEPLOY_SERVICE_NAME }} \
             --image $IMAGE_URL \
             --region ${{ env.GCP_REGION }} \
             --project ${{ env.GCP_PROJECT_ID }} \
             --allow-unauthenticated \
-            --port 3000
+            --port 3000 \
+            --set-env-vars="$ENV_VARS"
