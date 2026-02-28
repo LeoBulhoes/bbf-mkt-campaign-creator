@@ -7,11 +7,11 @@ def fetch_last_7_days_metrics() -> list:
     Returns:
         A list of dictionaries representing the last 7 days of performance.
     """
-    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT", "bluebullfly-5cc16")
+    GCP_PROJECT_ID = os.environ.get("GOOGLE_CLOUD_PROJECT", "bluebullfly-5cc16")
     dataset_id = "marketing_data"
     table_id = "daily_metrics"
     
-    client = bigquery.Client(project=project_id)
+    client = bigquery.Client(project=GCP_PROJECT_ID)
     
     query = f"""
         SELECT 
@@ -22,7 +22,7 @@ def fetch_last_7_days_metrics() -> list:
             shopify_aov, 
             ga_active_users, 
             ga_sessions
-        FROM `{project_id}.{dataset_id}.{table_id}`
+        FROM `{GCP_PROJECT_ID}.{dataset_id}.{table_id}`
         ORDER BY date DESC
         LIMIT 7
     """

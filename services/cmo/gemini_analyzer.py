@@ -27,9 +27,9 @@ def analyze_performance(metrics: list, target_roas: float = 3.5, target_cpa: flo
     Returns:
         DailyMarketingDecisions: Parsed JSON commands to execute.
     """
-    api_key = os.environ.get("GOOGLE_API_KEY")
+    api_key = os.environ.get("GOOGLE_AISTUDIO_API_KEY")
     if not api_key:
-        print("Error: Missing GOOGLE_API_KEY")
+        print("Error: Missing GOOGLE_AISTUDIO_API_KEY")
         return None
         
     client = genai.Client(api_key=api_key)

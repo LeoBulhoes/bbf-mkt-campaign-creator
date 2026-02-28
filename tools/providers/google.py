@@ -47,7 +47,7 @@ _POLL_URL = "https://generativelanguage.googleapis.com/v1beta/{operation_name}"
 def _headers():
     """Auth headers for Google AI Studio."""
     return {
-        "x-goog-api-key": config.GOOGLE_API_KEY,
+        "x-goog-api-key": config.GOOGLE_AISTUDIO_API_KEY,
         "Content-Type": "application/json",
     }
 

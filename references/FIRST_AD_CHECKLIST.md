@@ -8,7 +8,7 @@
 ## Phase 0: Prerequisites (YOU do this)
 
 - [ ] **1. Set up API keys** — Create or verify you have:
-  - [ ] `GOOGLE_API_KEY` — from [Google AI Studio](https://aistudio.google.com/apikey)
+  - [ ] `GOOGLE_AISTUDIO_API_KEY` — from [Google AI Studio](https://aistudio.google.com/apikey)
   - [ ] `GCP_BUCKET_NAME` — Your Google Cloud Storage bucket name
   - [ ] `AIRTABLE_API_KEY` + `AIRTABLE_BASE_ID` — from [Airtable](https://airtable.com/create/tokens)
   - [ ] `BLOTATO_API_KEY` — from [Blotato](https://blotato.com) (for scheduling)

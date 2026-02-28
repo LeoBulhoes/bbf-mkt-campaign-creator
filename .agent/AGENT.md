@@ -18,7 +18,7 @@ Walk the user through:
    pip install -r tools/requirements.txt
    ```
 2. Copy `references/.env.example` to `references/.env` and fill in API keys:
-   - `GOOGLE_API_KEY` — from https://aistudio.google.com/apikey (for image + video generation)
+   - `GOOGLE_AISTUDIO_API_KEY` — from https://aistudio.google.com/apikey (for image + video generation)
    - `AIRTABLE_API_KEY` — Airtable PAT with scopes: `data.records:read`, `data.records:write`, `schema.bases:read`, `schema.bases:write`
    - `AIRTABLE_BASE_ID` — from the Airtable base URL (`appXXXXXX`)
    - `BLOTATO_API_KEY` — from https://my.blotato.com → API settings

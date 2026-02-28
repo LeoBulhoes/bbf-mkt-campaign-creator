@@ -15,7 +15,7 @@ load_dotenv(ENV_PATH)
 # --- API Keys ---
 AIRTABLE_API_KEY = os.getenv("AIRTABLE_API_KEY")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GOOGLE_AISTUDIO_API_KEY = os.getenv("GOOGLE_AISTUDIO_API_KEY")
 GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
 
 # --- WaveSpeed AI ---
@@ -99,8 +99,8 @@ def check_credentials():
     missing = [name for name, value in required.items() if not value]
 
     # At least one generation provider must be configured
-    if not GOOGLE_API_KEY:
-        missing.append("GOOGLE_API_KEY (required for image/video generation)")
+    if not GOOGLE_AISTUDIO_API_KEY:
+        missing.append("GOOGLE_AISTUDIO_API_KEY (required for image/video generation)")
 
     if missing:
         print("Missing API keys:")
