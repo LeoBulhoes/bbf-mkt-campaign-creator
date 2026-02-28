@@ -12,8 +12,9 @@ env:
   GCP_DEPLOY_SERVICE_NAME: data-warehouse-etl
   GCP_REGION: us-central1
 
-
-
+permissions:
+  contents: 'read'
+  id-token: 'write'
 jobs:
   deploy:
     runs-on: ubuntu-latest
