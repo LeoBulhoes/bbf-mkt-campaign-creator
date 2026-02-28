@@ -45,7 +45,8 @@ def get_fresh_access_token():
 def publish_to_tiktok(local_path, media_url, caption):
     """
     Publishes to TikTok using the Content Posting API (PULL_FROM_URL).
-    Only supports videos.
+    Supports either a single video OR a list of image URLs (photo carousel).
+    media_url: A string (video URL) OR a list of strings (image URLs).
     """
     access_token = TIKTOK_ACCESS_TOKEN or get_fresh_access_token()
     
@@ -53,32 +54,60 @@ def publish_to_tiktok(local_path, media_url, caption):
         print("Skipping TikTok: Missing access token and could not refresh.")
         return False
         
-    is_video = media_url.lower().endswith(('.mp4', '.mov'))
-    if not is_video:
-        print("Skipping TikTok: Only video publishing is supported.")
-        return False
-        
-    url = "https://open.tiktokapis.com/v2/post/publish/video/init/"
-    
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json; charset=UTF-8"
     }
-    
-    payload = {
-        "post_info": {
-            "title": caption,
-            "privacy_level": "PUBLIC_TO_EVERYONE",
-            "disable_duet": False,
-            "disable_comment": False,
-            "disable_stitch": False,
-            "video_cover_timestamp_ms": 1000
-        },
-        "source_info": {
-            "source": "PULL_FROM_URL",
-            "video_url": media_url
+
+    # Handle Photo Carousel (List of URLs)
+    if isinstance(media_url, list):
+        if not media_url:
+            print("Skipping TikTok: Empty image list provided for carousel.")
+            return False
+            
+        print(f"Preparing TikTok Photo Carousel with {len(media_url)} images.")
+        url = "https://open.tiktokapis.com/v2/post/publish/content/init/"
+        
+        payload = {
+            "post_info": {
+                "title": caption,
+                "privacy_level": "SELF_ONLY",
+                "disable_duet": False,
+                "disable_comment": False,
+                "disable_stitch": False
+            },
+            "source_info": {
+                "source": "PULL_FROM_URL",
+                "photo_images": media_url
+            },
+            "post_mode": "DIRECT_POST",
+            "media_type": "PHOTO"
         }
-    }
+        
+    # Handle Video (Single String URL)
+    else:
+        is_video = media_url.lower().endswith(('.mp4', '.mov'))
+        if not is_video:
+            print("Skipping TikTok: Media is not a video and not a list of images.")
+            return False
+            
+        print("Preparing TikTok Video publish.")
+        url = "https://open.tiktokapis.com/v2/post/publish/video/init/"
+        
+        payload = {
+            "post_info": {
+                "title": caption,
+                "privacy_level": "SELF_ONLY",
+                "disable_duet": False,
+                "disable_comment": False,
+                "disable_stitch": False,
+                "video_cover_timestamp_ms": 1000
+            },
+            "source_info": {
+                "source": "PULL_FROM_URL",
+                "video_url": media_url
+            }
+        }
     
     resp = requests.post(url, headers=headers, json=payload)
     

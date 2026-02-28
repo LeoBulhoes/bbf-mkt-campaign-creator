@@ -37,36 +37,47 @@ def run_publisher():
             ad_name = fields.get("Ad Name", "untitled")
             caption = fields.get("Caption", "Default caption")
             
-            # Use 'Generated Video 1' or 'Generated Image 1' as the media
-            # If masked versions exist, prioritize those?
-            media_att = fields.get("Masked Video 1") or fields.get("Generated Video 1") or \
-                        fields.get("Masked Image 1") or fields.get("Generated Image 1")
-                        
+            media_att = fields.get("Masked Video 1") or fields.get("Generated Video 1")
+            
+            # If no video found, fallback to images for a photo carousel (currently only TikTok supports this in our integration)
+            is_carousel = False
+            if not media_att:
+                media_att = fields.get("Masked Image 1") or fields.get("Generated Image 1")
+                is_carousel = True
+                
             if not media_att or not isinstance(media_att, list):
                 print(f"Skipping {ad_name}: No valid media attachment.")
                 continue
                 
-            media_url = media_att[0].get("url")
-            if not media_url:
-                print(f"Skipping {ad_name}: No media URL found.")
-                continue
+            # For videos, we take the first URL
+            # For carousels, we take a list of all URLs
+            if is_carousel:
+                media_url = [att.get("url") for att in media_att if att.get("url")]
+                local_path = None # We don't download local copies for carousels right now
+            else:
+                media_url = media_att[0].get("url")
                 
-            # Download to temp file
-            ext = media_url.split(".")[-1][:4] if "." in media_url else "tmp"
-            # Cleanup URL parameters if they exist
-            ext = ext.split("?")[0]
-            local_path = os.path.join(tempfile.gettempdir(), f"{uuid.uuid4().hex}.{ext}")
-            
-            if not download_media(media_url, local_path):
-                continue
+                # Download to temp file
+                ext = media_url.split(".")[-1][:4] if "." in media_url else "tmp"
+                # Cleanup URL parameters if they exist
+                ext = ext.split("?")[0]
+                local_path = os.path.join(tempfile.gettempdir(), f"{uuid.uuid4().hex}.{ext}")
                 
+                if not download_media(media_url, local_path):
+                    continue
+                    
             print(f"Publishing {ad_name} across platforms...")
             
-            publish_to_instagram(local_path, media_url, caption)
-            publish_to_facebook(local_path, media_url, caption)
-            publish_to_tiktok(local_path, media_url, caption)
-            publish_to_pinterest(local_path, media_url, caption)
-            publish_to_youtube(local_path, media_url, caption)
+            if is_carousel:
+                print("Detected image assets. Attempting to publish Photo Carousel to TikTok...")
+                publish_to_tiktok(local_path, media_url, caption)
+                # Currently skipping other platforms for photo carousels as their integrations expect video files
+            else:
+                publish_to_instagram(local_path, media_url, caption)
+                publish_to_facebook(local_path, media_url, caption)
+                publish_to_tiktok(local_path, media_url, caption)
+                publish_to_pinterest(local_path, media_url, caption)
+                publish_to_youtube(local_path, media_url, caption)
             
             print(f"Successfully published {ad_name}. Marking as published.")
             mark_as_published(record_id)
@@ -84,6 +95,50 @@ def run_publisher():
     except Exception as e:
         print(f"Publisher error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route("/assets/<path:blob_name>", methods=["GET"])
+def proxy_gcs_asset(blob_name):
+    """
+    Proxies media files from Google Cloud Storage.
+    This masks the storage.googleapis.com domain with our own API domain,
+    bypassing TikTok's strict 'url_ownership_unverified' sandbox restriction.
+    """
+    try:
+        from google.cloud import storage
+        from flask import Response
+        import mimetypes
+        
+        bucket_name = os.environ.get("GCP_BUCKET_NAME", "bluebullfly")
+        client = storage.Client()
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(blob_name)
+        
+        if not blob.exists():
+            return "Asset not found", 404
+            
+        def generate():
+            # Download the blob in chunks completely in-memory and stream it to the client
+            with blob.open("rb") as f:
+                while chunk := f.read(8192):
+                    yield chunk
+                    
+        # Guess the correct mimetype so TikTok parses it correctly
+        mime_type, _ = mimetypes.guess_type(blob_name)
+        if not mime_type:
+            mime_type = "application/octet-stream"
+            
+        return Response(generate(), mimetype=mime_type)
+        
+    except Exception as e:
+        print(f"GCS Proxy Error: {e}")
+        return str(e), 500
+
+@app.route("/tiktoktrY7FK0lCU5ICdE1F6sLQjhtuMwh3rJk.txt", methods=["GET"])
+def tiktok_verify():
+    """
+    Route to serve the TikTok Domain Verification file.
+    """
+    return "tiktok-developers-site-verification=trY7FK0lCU5ICdE1F6sLQjhtuMwh3rJk", 200
 
 @app.route("/tiktok/callback", methods=["GET"])
 def tiktok_callback():
@@ -139,18 +194,21 @@ def tiktok_callback():
         refresh_token = data.get("refresh_token")
         expires_in = data.get("expires_in")
         
+        # SECURE LOGGING: Print the tokens so they go to GCP Cloud Logging
+        # Users must have GCP IAM permissions to view these tokens.
+        print("\n" + "="*50)
+        print(f"TIKTOK_ACCESS_TOKEN={access_token}")
+        print(f"TIKTOK_REFRESH_TOKEN={refresh_token}")
+        print("="*50 + "\n")
+        
         html = f"""
         <html>
             <body style="font-family: sans-serif; padding: 2rem;">
                 <h1 style="color: green;">TikTok Authorization Successful!</h1>
-                <p>Add these values directly to your <code>env.dev</code> and GCP Secret Manager:</p>
-                <h3>TIKTOK_ACCESS_TOKEN</h3>
-                <pre style="background:#eee;padding:10px;border-radius:4px;word-break: break-all;">{access_token}</pre>
-                
-                <h3>TIKTOK_REFRESH_TOKEN (Save this! It will let you refresh the token after {expires_in} seconds)</h3>
-                <pre style="background:#eee;padding:10px;border-radius:4px;word-break: break-all;">{refresh_token}</pre>
-                
-                <p>Once you copy these to your `.env` (or GCP Secrets), you can close this window!</p>
+                <p>For security purposes, the tokens are not displayed on this page.</p>
+                <p>Please check the <strong>Cloud Run Logs</strong> for the <code>publisher-api</code> service in your Google Cloud Console to retrieve the tokens.</p>
+                <p><a href="https://console.cloud.google.com/logs/query?project={os.environ.get('GCP_PROJECT_ID', 'bluebullfly-5cc16')}">Click here to view your GCP Logs</a></p>
+                <p>Once you copy them to your `.env` (or GCP Secrets), you can close this window!</p>
             </body>
         </html>
         """
