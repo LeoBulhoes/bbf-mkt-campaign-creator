@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'services/publisher/**'
+  workflow_dispatch:
+
 
 env:
   GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
