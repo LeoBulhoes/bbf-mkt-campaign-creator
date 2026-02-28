@@ -6,14 +6,51 @@ import os
 import requests
 
 TIKTOK_ACCESS_TOKEN = os.environ.get("TIKTOK_ACCESS_TOKEN")
+TIKTOK_REFRESH_TOKEN = os.environ.get("TIKTOK_REFRESH_TOKEN")
+TIKTOK_CLIENT_KEY = os.environ.get("TIKTOK_CLIENT_KEY")
+TIKTOK_CLIENT_SECRET = os.environ.get("TIKTOK_CLIENT_SECRET")
+
+def get_fresh_access_token():
+    """
+    Exchanges the long-lived refresh token for a new 24-hour access token.
+    """
+    if not all([TIKTOK_REFRESH_TOKEN, TIKTOK_CLIENT_KEY, TIKTOK_CLIENT_SECRET]):
+        print("Missing TikTok credentials for token refresh.")
+        return None
+        
+    url = "https://open.tiktokapis.com/v2/oauth/token/"
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cache-Control": "no-cache"
+    }
+    payload = {
+        "client_key": TIKTOK_CLIENT_KEY,
+        "client_secret": TIKTOK_CLIENT_SECRET,
+        "grant_type": "refresh_token",
+        "refresh_token": TIKTOK_REFRESH_TOKEN
+    }
+    
+    try:
+        resp = requests.post(url, headers=headers, data=payload)
+        data = resp.json()
+        if data.get("access_token"):
+            return data.get("access_token")
+        else:
+            print(f"Failed to refresh TikTok token: {data}")
+            return None
+    except Exception as e:
+        print(f"Error refreshing TikTok token: {e}")
+        return None
 
 def publish_to_tiktok(local_path, media_url, caption):
     """
     Publishes to TikTok using the Content Posting API (PULL_FROM_URL).
     Only supports videos.
     """
-    if not TIKTOK_ACCESS_TOKEN:
-        print("Skipping TikTok: Missing credentials.")
+    access_token = TIKTOK_ACCESS_TOKEN or get_fresh_access_token()
+    
+    if not access_token:
+        print("Skipping TikTok: Missing access token and could not refresh.")
         return False
         
     is_video = media_url.lower().endswith(('.mp4', '.mov'))
@@ -24,7 +61,7 @@ def publish_to_tiktok(local_path, media_url, caption):
     url = "https://open.tiktokapis.com/v2/post/publish/video/init/"
     
     headers = {
-        "Authorization": f"Bearer {TIKTOK_ACCESS_TOKEN}",
+        "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json; charset=UTF-8"
     }
     
