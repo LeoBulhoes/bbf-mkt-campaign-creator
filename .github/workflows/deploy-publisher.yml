@@ -12,6 +12,10 @@ env:
   GCP_DEPLOY_SERVICE_NAME: publisher-api
   GCP_REGION: us-central1
 
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
