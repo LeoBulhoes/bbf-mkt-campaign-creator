@@ -1,5 +1,6 @@
 ---
 description: Create a 30-day marketing campaign with daily scheduled posts — from brand discovery to autopilot
+agent: /Users/leo/Leo/Bulhoes.org/Marketing Bot/.agent/agents/Creative Content Engine/instructions.md
 ---
 
 # 30-Day Marketing Campaign Workflow

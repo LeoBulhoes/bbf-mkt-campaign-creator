@@ -1,5 +1,6 @@
 ---
 description: Clone a winning ad — analyze it, break into scenes, regenerate with your product and brand
+agent: /Users/leo/Leo/Bulhoes.org/Marketing Bot/.agent/agents/Creative Content Engine/instructions.md
 ---
 
 # Clone Winning Ad Workflow

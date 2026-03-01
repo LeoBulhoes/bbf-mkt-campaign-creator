@@ -54,8 +54,12 @@ Create a table called `Content` in your Airtable base with these fields:
 
 ```
 .agent/                - Agent config, skills, workflows
-  AGENT.md             - Agent instructions (this file)
-  AGENT_BASIC.md       - Basic version (reference only)
+  agents/              - Sub-agents definitions and rules
+    Creative-Content-Engine/
+      instructions.md  - Agent instructions (this file)
+    Video-Ad-Director/
+      instructions.md  - Specific agent role definitions
+      prompt_templates.md
   skills/              - Reusable agent skills
     blotato_best_practices/  - Blotato posting guidelines
     modal_deployment/        - Modal.com serverless deployment

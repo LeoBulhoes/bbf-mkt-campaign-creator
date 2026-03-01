@@ -34,3 +34,5 @@ Thumbs.db
 
 # Agent/Gemini local state
 .gemini/
+ad-creation/sessions/
+ad-creation/manual/

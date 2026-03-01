@@ -9,11 +9,6 @@ on:
   workflow_dispatch:
 
 
-env:
-  GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-  GCP_DEPLOY_SERVICE_NAME: publisher-api
-  GCP_REGION: us-central1
-
 permissions:
   contents: 'read'
   id-token: 'write'
@@ -24,6 +19,10 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_DEPLOY_SERVICE_NAME: publisher-api
+      GCP_REGION: us-central1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
